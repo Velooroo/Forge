@@ -1,0 +1,56 @@
+### Health check
+GET http://localhost:8080/api/health
+
+### Register user
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Login
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+### Get user info (requires auth)
+GET http://localhost:8080/api/users/me
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Create repository (requires auth)
+POST http://localhost:8080/api/repos
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "name": "my-repo",
+  "description": "Test repository",
+  "is_private": false
+}
+
+### List user repositories
+GET http://localhost:8080/api/repos
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Get specific repository
+GET http://localhost:8080/api/repos/testuser/my-repo
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Delete repository
+DELETE http://localhost:8080/api/repos/testuser/my-repo
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Git clone (info/refs)
+GET http://localhost:8080/git/testuser/my-repo/info/refs?service=git-upload-pack
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Get archive
+GET http://localhost:8080/git/testuser/my-repo/archive
+Authorization: Bearer YOUR_TOKEN_HERE

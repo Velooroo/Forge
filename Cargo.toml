@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "apps/api",
+#    "libs/shared",
+]
+resolver = "2"

@@ -1,0 +1,24 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/auth/login
+  body: json
+}
+
+body:json {
+  {
+    "username": "testuser",
+    "password": "password123"
+  }
+}
+
+script:post-response {
+  // Сохраняем токен в переменную окружения
+  if (res.status === 200) {
+    bru.setEnvVar("token", res.body.token);
+  }
+}
