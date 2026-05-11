@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LogOut, Cpu, LayoutDashboard, FolderGit2, Settings, User } from 'lucide-svelte';
+	import { LogOut, Cpu, LayoutDashboard, FolderGit2, Settings, User, Search } from 'lucide-svelte';
 	import { logout } from '../../api/auth';
 	import { fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
@@ -10,11 +10,12 @@
 	onMount(() => { mounted = true; });
 </script>
 
-<div class="flex min-h-screen bg-[#050608] text-white">
-	<!-- Sidebar = стеклянная рамка -->
-	<aside class="relative flex w-56 shrink-0 flex-col rounded-l-2xl border-r border-white/[0.06] bg-red-950/20 backdrop-blur-xl shadow-[inset_-1px_0_0_rgba(220,38,38,0.15)]">
+<!-- Sidebar = весь фон экрана, контент — карточка внутри -->
+<div class="flex min-h-screen bg-[#0c0d0f] text-white">
+	<!-- Nav panel (часть сайдбара) -->
+	<aside class="flex w-56 shrink-0 flex-col border-r border-white/[0.06]">
 		<div class="flex items-center gap-3 px-5 py-4">
-			<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/20">
+			<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 to-rose-600">
 				<Cpu class="h-4 w-4 text-white" />
 			</div>
 			<div class="text-sm font-semibold text-white/90">Forge</div>
@@ -49,12 +50,29 @@
 		</div>
 	</aside>
 
-	<!-- Main content — без рамки -->
-	<main class="flex-1 overflow-auto">
-		{#if mounted}
-			<div in:fade={{ duration: 200, easing: cubicOut }}>
-				{@render children()}
+	<!-- Правая часть — тоже фон сайдбара, внутри скруглённая карточка контента -->
+	<div class="flex flex-1 flex-col">
+		<!-- Поиск сверху -->
+		<div class="border-b border-white/[0.06] px-6 py-3">
+			<div class="relative max-w-md">
+				<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+				<input
+					type="text"
+					placeholder="Search..."
+					class="h-9 w-full rounded-lg border border-white/[0.06] bg-white/[0.04] pl-10 pr-4 text-sm text-white/60 placeholder-white/20 outline-none transition-all focus:border-red-400/30 focus:bg-white/[0.06]"
+				/>
 			</div>
-		{/if}
-	</main>
+		</div>
+
+		<!-- Контент с отступами — скруглённая карточка как экран внутри рамки -->
+		<div class="flex-1 px-6 py-5">
+			<div class="h-full rounded-2xl bg-[#08090b] p-6">
+				{#if mounted}
+					<div in:fade={{ duration: 200, easing: cubicOut }}>
+						{@render children()}
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
 </div>

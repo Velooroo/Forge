@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fade, slide, scale } from 'svelte/transition';
 	import { cubicOut, quintOut } from 'svelte/easing';
-	import { Plus, FolderGit2, Globe, Lock, Eye, ArrowRight, GitFork, Search, Cpu, X } from 'lucide-svelte';
+	import { Plus, FolderGit2, Globe, Lock, Eye, ArrowRight, GitFork, Cpu, X } from 'lucide-svelte';
 	import { listRepos, createRepo, type Repo } from '../../api/repos';
 	import { isAuthenticated } from '../../api/auth';
 
@@ -52,31 +52,19 @@
 		: repos);
 </script>
 
-<div class="p-6 lg:p-8">
-	<!-- HEADER -->
-	<div class="mb-8 flex items-center justify-between">
+<div>
+	<div class="mb-6 flex items-center justify-between">
 		<div>
-			<h1 class="text-3xl font-bold tracking-tight">Repositories</h1>
+			<h1 class="text-2xl font-bold tracking-tight">Repositories</h1>
 			<p class="mt-1 text-sm text-white/40">Manage your Git repositories</p>
 		</div>
 		<button
 			onclick={() => (showCreate = true)}
-			class="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-red-500 to-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-red-500/15 transition-all hover:scale-[1.02] hover:shadow-red-500/25"
+			class="flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-red-500/15 transition-all hover:scale-[1.02]"
 		>
 			<Plus class="h-4 w-4" />
 			New Repository
 		</button>
-	</div>
-
-	<!-- SEARCH -->
-	<div class="relative mb-6 max-w-md">
-		<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-		<input
-			type="text"
-			placeholder="Search repositories..."
-			bind:value={searchQuery}
-			class="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder-white/25 transition-all focus:border-red-400/40 focus:bg-white/10 focus:outline-none focus:ring-red-500/20"
-		/>
 	</div>
 
 	<!-- CREATE MODAL -->
