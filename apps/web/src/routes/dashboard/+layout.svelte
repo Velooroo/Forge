@@ -10,63 +10,66 @@
 	onMount(() => { mounted = true; });
 </script>
 
-<!-- Sidebar = весь фон экрана, контент — карточка внутри -->
-<div class="flex min-h-screen bg-[#0c0d0f] text-white">
-	<!-- Nav panel (часть сайдбара) -->
-	<aside class="flex w-56 shrink-0 flex-col border-r border-white/[0.06]">
-		<div class="flex items-center gap-3 px-5 py-4">
-			<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 to-rose-600">
-				<Cpu class="h-4 w-4 text-white" />
+<div class="flex min-h-screen bg-white text-gray-900">
+	<!-- Sidebar — яркий красный glass -->
+	<aside class="flex w-60 shrink-0 flex-col bg-gradient-to-b from-red-500/90 to-red-600/90 backdrop-blur-xl shadow-xl">
+		<div class="flex items-center gap-3 px-5 py-5">
+			<div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20">
+				<Cpu class="h-5 w-5 text-white" />
 			</div>
-			<div class="text-sm font-semibold text-white/90">Forge</div>
+			<div class="text-lg font-bold text-white">Forge</div>
 		</div>
 
-		<div class="border-t border-white/[0.06] px-5 py-3">
+		<div class="px-5 py-3">
 			<div class="flex items-center gap-3">
-				<div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/20 text-[11px] font-semibold text-red-400">U</div>
+				<div class="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-sm font-semibold text-white">U</div>
 				<div class="min-w-0 flex-1">
-					<div class="truncate text-sm text-white/70">User</div>
-					<div class="truncate text-[11px] text-white/40">@user</div>
+					<div class="truncate text-sm font-medium text-white/90">User</div>
+					<div class="truncate text-xs text-white/60">@user</div>
 				</div>
 			</div>
 		</div>
 
-		<nav class="flex-1 space-y-0.5 px-3 py-3">
-			<a href="/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
-				<LayoutDashboard class="h-4 w-4" /> Dashboard
+		<nav class="flex-1 space-y-1 px-3 py-4">
+			<a href="/dashboard" class="group flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 text-sm font-medium text-white shadow-lg shadow-black/5 transition-all hover:bg-white/20 hover:shadow-xl hover:shadow-black/10">
+				<LayoutDashboard class="h-4 w-4" />
+				<span>Dashboard</span>
 			</a>
-			<a href="/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
-				<FolderGit2 class="h-4 w-4" /> Repositories
+			<a href="/dashboard" class="group flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 text-sm font-medium text-white/80 transition-all hover:bg-white/20 hover:shadow-xl hover:shadow-black/10">
+				<FolderGit2 class="h-4 w-4" />
+				<span>Repositories</span>
 			</a>
-			<a href="/dashboard/settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
-				<Settings class="h-4 w-4" /> Settings
+			<a href="/dashboard/settings" class="group flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 text-sm font-medium text-white/80 transition-all hover:bg-white/20 hover:shadow-xl hover:shadow-black/10">
+				<Settings class="h-4 w-4" />
+				<span>Settings</span>
 			</a>
 		</nav>
 
-		<div class="border-t border-white/[0.06] p-3">
-			<button onclick={logout} class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/40 transition-all hover:bg-white/[0.06] hover:text-red-400">
-				<LogOut class="h-4 w-4" /> Sign out
+		<div class="px-3 py-3">
+			<button onclick={logout} class="flex w-full items-center gap-3 rounded-xl bg-white/5 px-4 py-3 text-sm font-medium text-white/70 transition-all hover:bg-white/20 hover:text-white">
+				<LogOut class="h-4 w-4" />
+				<span>Sign out</span>
 			</button>
 		</div>
 	</aside>
 
-	<!-- Правая часть — тоже фон сайдбара, внутри скруглённая карточка контента -->
-	<div class="flex flex-1 flex-col">
-		<!-- Поиск сверху -->
-		<div class="border-b border-white/[0.06] px-6 py-3">
-			<div class="relative max-w-md">
-				<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+	<!-- Content area — светлая -->
+	<div class="flex flex-1 flex-col bg-gray-50">
+		<!-- Top bar с поиском по центру -->
+		<div class="flex items-center justify-center border-b border-gray-200/60 bg-white px-6 py-3">
+			<div class="relative w-full max-w-lg">
+				<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
 				<input
 					type="text"
 					placeholder="Search..."
-					class="h-9 w-full rounded-lg border border-white/[0.06] bg-white/[0.04] pl-10 pr-4 text-sm text-white/60 placeholder-white/20 outline-none transition-all focus:border-red-400/30 focus:bg-white/[0.06]"
+					class="h-9 w-full rounded-lg border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm text-gray-600 outline-none transition-all placeholder:text-gray-400 focus:border-red-300 focus:bg-white focus:ring-2 focus:ring-red-100"
 				/>
 			</div>
 		</div>
 
-		<!-- Контент с отступами — скруглённая карточка как экран внутри рамки -->
-		<div class="flex-1 px-6 py-5">
-			<div class="h-full rounded-2xl bg-[#08090b] p-6">
+		<!-- Content card — скруглённая, с тенью -->
+		<div class="flex-1 px-8 py-6">
+			<div class="h-full rounded-2xl border border-gray-200/60 bg-white p-6 shadow-sm">
 				{#if mounted}
 					<div in:fade={{ duration: 200, easing: cubicOut }}>
 						{@render children()}

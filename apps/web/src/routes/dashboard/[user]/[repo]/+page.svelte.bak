@@ -121,37 +121,37 @@
 			<div class="h-8 w-8 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
 		</div>
 	{:else if error}
-		<div class="flex flex-col items-center justify-center py-20 text-gray-300">
+		<div class="flex flex-col items-center justify-center py-20 text-white/30">
 			<File class="mb-4 h-12 w-12" />
 			<p class="text-lg font-medium">{error}</p>
 		</div>
 	{:else if repo}
 		<div in:fade={{ duration: 300, easing: cubicOut }}>
 			<!-- BREADCRUMB -->
-			<div class="mb-6 flex items-center gap-2 text-sm text-gray-400">
-				<a href="/dashboard" class="transition-colors hover:text-gray-500">Repositories</a>
+			<div class="mb-6 flex items-center gap-2 text-sm text-white/40">
+				<a href="/dashboard" class="transition-colors hover:text-white/60">Repositories</a>
 				<ChevronRight class="h-3 w-3" />
-				<a href="/dashboard/{params.user}" class="transition-colors hover:text-gray-500">{params.user}</a>
+				<a href="/dashboard/{params.user}" class="transition-colors hover:text-white/60">{params.user}</a>
 				<ChevronRight class="h-3 w-3" />
-				<span class="text-gray-800">{repo.name}</span>
+				<span class="text-white/80">{repo.name}</span>
 			</div>
 
 			<!-- REPO HEADER -->
-			<div class="mb-6 rounded-2xl border border-gray-200 bg-gray-50/80 p-6">
+			<div class="mb-6 rounded-2xl border border-white/10 bg-white/[0.04] p-6">
 				<div class="flex items-start justify-between">
 					<div class="min-w-0 flex-1">
 						<div class="flex items-center gap-3">
 							<h1 class="truncate text-2xl font-bold">{repo.name}</h1>
 							<span
-								class="shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'public' ? 'border-red-400/20 text-red-400/60' : repo.visibility === 'internal' ? 'border-blue-400/20 text-blue-500/80' : 'border-gray-200 text-gray-400'}"
+								class="shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'public' ? 'border-red-400/20 text-red-400/60' : repo.visibility === 'internal' ? 'border-blue-400/20 text-blue-400/60' : 'border-white/10 text-white/40'}"
 							>
 								{repo.visibility}
 							</span>
 						</div>
 						{#if repo.description}
-							<p class="mt-1 text-sm text-gray-400">{repo.description}</p>
+							<p class="mt-1 text-sm text-white/40">{repo.description}</p>
 						{/if}
-						<div class="mt-4 flex items-center gap-4 text-xs text-gray-300">
+						<div class="mt-4 flex items-center gap-4 text-xs text-white/30">
 							<span class="flex items-center gap-1">
 								<GitBranch class="h-3 w-3" /> main
 							</span>
@@ -166,7 +166,7 @@
 						<div class="relative">
 							<button
 								onclick={() => (showVisMenu = !showVisMenu)}
-								class="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-xs font-medium text-gray-500 transition-all hover:bg-gray-50 hover:text-white"
+								class="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-xs font-medium text-white/60 transition-all hover:bg-white/5 hover:text-white"
 							>
 								{#if repo.visibility === 'public'}
 									<Globe class="h-3 w-3" />
@@ -178,18 +178,18 @@
 								Change Visibility
 							</button>
 							{#if showVisMenu}
-								<div class="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-gray-200 bg-white p-1 shadow-2xl backdrop-blur-xl"
+								<div class="absolute right-0 top-full z-20 mt-1 w-44 rounded-xl border border-white/10 bg-[#0a0e10] p-1 shadow-2xl backdrop-blur-xl"
 									transition:scale={{ duration: 150, start: 0.95 }}>
 									<button onclick={() => changeVis('private')}
-										class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-gray-500 transition-all hover:bg-gray-50 hover:text-white">
+										class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-white/60 transition-all hover:bg-white/5 hover:text-white">
 										<Lock class="h-3 w-3" /> Private
 									</button>
 									<button onclick={() => changeVis('internal')}
-										class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-gray-500 transition-all hover:bg-gray-50 hover:text-white">
+										class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-white/60 transition-all hover:bg-white/5 hover:text-white">
 										<Eye class="h-3 w-3" /> Internal
 									</button>
 									<button onclick={() => changeVis('public')}
-										class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-gray-500 transition-all hover:bg-gray-50 hover:text-white">
+										class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-white/60 transition-all hover:bg-white/5 hover:text-white">
 										<Globe class="h-3 w-3" /> Public
 									</button>
 								</div>
@@ -197,17 +197,17 @@
 						</div>
 
 						<a href={repo.clone_url.replace('http://localhost:8080/git/', 'http://localhost:8080/git/') + '/archive'}
-							class="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-xs font-medium text-gray-500 transition-all hover:bg-gray-50 hover:text-white">
+							class="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-xs font-medium text-white/60 transition-all hover:bg-white/5 hover:text-white">
 							<Download class="h-3 w-3" /> Download
 						</a>
 					</div>
 				</div>
 
 				<!-- Quick clone -->
-				<div class="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
-					<code class="flex-1 text-xs text-gray-400 font-mono">{repo.clone_url}</code>
+				<div class="mt-4 flex items-center gap-2 rounded-xl bg-white/5 px-4 py-3">
+					<code class="flex-1 text-xs text-white/40 font-mono">{repo.clone_url}</code>
 					<button onclick={copyUrl}
-						class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-gray-400 transition-all hover:bg-gray-100 hover:text-red-400">
+						class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-white/40 transition-all hover:bg-white/10 hover:text-red-400">
 						<Copy class="h-3 w-3" />
 						{coped ? 'Copied!' : 'Copy'}
 					</button>
@@ -217,16 +217,16 @@
 			<!-- FILE TREE + README -->
 			<div class="grid gap-6 lg:grid-cols-[320px_1fr]">
 				<!-- FILE TREE -->
-				<div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-4"
+				<div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4"
 					in:fade={{ duration: 300, delay: 100, easing: cubicOut }}>
-					<div class="mb-3 flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
+					<div class="mb-3 flex items-center gap-2 text-xs font-medium text-white/40 uppercase tracking-wider">
 						<Folder class="h-3 w-3" /> Files
 					</div>
 					<div class="space-y-0.5">
 						{#each treeData as item}
 							<button
 								onclick={() => toggleFolder(item)}
-								class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-all hover:bg-gray-50 hover:text-white"
+								class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/60 transition-all hover:bg-white/5 hover:text-white"
 							>
 								{#if item.type === 'tree'}
 									{#if item.expanded}
@@ -234,32 +234,32 @@
 									{:else}
 										<ChevronRight class="h-3 w-3 shrink-0" />
 									{/if}
-									<Folder class="h-4 w-4 shrink-0 text-amber-500/80" />
+									<Folder class="h-4 w-4 shrink-0 text-amber-400/60" />
 								{:else}
 									<span class="w-3 shrink-0" />
-									<File class="h-4 w-4 shrink-0 text-blue-500/80" />
+									<File class="h-4 w-4 shrink-0 text-blue-400/60" />
 								{/if}
 								<span class="truncate">{item.name}</span>
 							</button>
 							{#if item.type === 'tree' && item.expanded && item.children}
-								<div class="ml-4 border-l border-gray-200 pl-2" in:slide={{ duration: 200 }}>
+								<div class="ml-4 border-l border-white/10 pl-2" in:slide={{ duration: 200 }}>
 									{#each item.children as child}
 										<button
-											class="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-all hover:bg-gray-50 hover:text-white"
+											class="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-white/50 transition-all hover:bg-white/5 hover:text-white"
 										>
 											{#if child.type === 'tree'}
-												<Folder class="h-4 w-4 shrink-0 text-amber-500/80" />
+												<Folder class="h-4 w-4 shrink-0 text-amber-400/60" />
 											{:else}
-												<File class="h-4 w-4 shrink-0 text-blue-500/80" />
+												<File class="h-4 w-4 shrink-0 text-blue-400/60" />
 											{/if}
 											<span class="truncate">{child.name}</span>
 										</button>
 										{#if child.type === 'tree' && child.children}
 											{#each child.children as grandchild}
 												<button
-													class="ml-4 flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-gray-600 transition-all hover:bg-gray-50 hover:text-white"
+													class="ml-4 flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-white/50 transition-all hover:bg-white/5 hover:text-white"
 												>
-													<File class="h-4 w-4 shrink-0 text-blue-500/80" />
+													<File class="h-4 w-4 shrink-0 text-blue-400/60" />
 													<span class="truncate">{grandchild.name}</span>
 												</button>
 											{/each}
@@ -272,21 +272,21 @@
 				</div>
 
 				<!-- README / CONTENT -->
-				<div class="rounded-2xl border border-gray-200 bg-gray-50/80 p-6"
+				<div class="rounded-2xl border border-white/10 bg-white/[0.04] p-6"
 					in:fade={{ duration: 300, delay: 200, easing: cubicOut }}>
-					<div class="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase tracking-wider">
+					<div class="flex items-center gap-2 text-xs font-medium text-white/40 uppercase tracking-wider">
 						<MessageSquare class="h-3 w-3" /> README.md
 					</div>
-					<div class="prose prose-invert mt-4 max-w-none text-sm text-gray-500">
-						<h1 class="text-gray-800">{repo.name}</h1>
+					<div class="prose prose-invert mt-4 max-w-none text-sm text-white/60">
+						<h1 class="text-white/80">{repo.name}</h1>
 						{#if repo.description}
 							<p>{repo.description}</p>
 						{:else}
 							<p>No description provided.</p>
 						{/if}
-						<hr class="border-gray-200" />
+						<hr class="border-white/10" />
 						<h2>Getting Started</h2>
-						<pre class="rounded-xl bg-gray-50 p-4 text-xs"><code>git clone {repo.clone_url}
+						<pre class="rounded-xl bg-white/5 p-4 text-xs"><code>git clone {repo.clone_url}
 cd {repo.name.split('/').pop() || repo.name}
 					</code></pre>
 					</div>
