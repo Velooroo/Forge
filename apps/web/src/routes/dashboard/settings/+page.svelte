@@ -2,8 +2,13 @@
 	import { fade } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { User, Key, Bell, Shield } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
-	let email = $state(localStorage.getItem('email') || '');
+	let email = $state('');
+
+	onMount(() => {
+		email = localStorage.getItem('email') || '';
+	});
 </script>
 
 <div class="p-6 lg:p-8" in:fade={{ duration: 300, easing: cubicOut }}>

@@ -3,9 +3,10 @@
 	import Input from '../components/ui/Input.svelte';
 	import Label from '../components/ui/Label.svelte';
 	import { Cpu, Github, ArrowRight, Sparkles, UserPlus } from 'lucide-svelte';
-	import { login, register, isAuthenticated } from '../api/auth';
+	import { login, register, isAuthenticated, browser } from '../api/auth';
 	import { fade, scale, type TransitionConfig } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
 
 	let email = $state('');
 	let password = $state('');
@@ -13,9 +14,11 @@
 	let isRegister = $state(false);
 	let authError = $state('');
 
-	if (isAuthenticated()) {
-		window.location.href = '/dashboard';
-	}
+	onMount(() => {
+		if (isAuthenticated()) {
+			window.location.href = '/dashboard';
+		}
+	});
 
 	async function handleAuth(e: Event) {
 		e.preventDefault();

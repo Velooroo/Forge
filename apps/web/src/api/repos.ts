@@ -19,12 +19,17 @@ export async function getRepo(id: string): Promise<Repo> {
 	return res.json();
 }
 
+function getToken(): string | null {
+	if (typeof localStorage === 'undefined') return null;
+	return localStorage.getItem('token');
+}
+
 export async function createRepo(data: {
 	name: string;
 	description?: string;
 	visibility?: string;
 }): Promise<Repo> {
-	const token = localStorage.getItem('token');
+	const token = getToken();
 	const res = await fetch('http://localhost:8080/api/repos/create', {
 		method: 'POST',
 		headers: {
@@ -61,7 +66,7 @@ export async function updateVisibility(
 	id: string,
 	visibility: string
 ): Promise<void> {
-	const token = localStorage.getItem('token');
+	const token = getToken();
 	const res = await fetch(`http://localhost:8080/api/repos/${id}/visibility`, {
 		method: 'PUT',
 		headers: {

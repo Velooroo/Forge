@@ -1,3 +1,20 @@
+import { browser } from '$app/environment';
+
+function getStorage(key: string): string | null {
+	if (!browser) return null;
+	return localStorage.getItem(key);
+}
+
+function setStorage(key: string, value: string) {
+	if (!browser) return;
+	localStorage.setItem(key, value);
+}
+
+function removeStorage(key: string) {
+	if (!browser) return;
+	localStorage.removeItem(key);
+}
+
 export async function login(email: string, password: string) {
 	const res = await fetch('http://localhost:8080/api/auth/login', {
 		method: 'POST',
@@ -7,8 +24,8 @@ export async function login(email: string, password: string) {
 	if (!res.ok) throw new Error(`Login failed: HTTP ${res.status}`);
 
 	const token = btoa(`${email}:${password}`);
-	localStorage.setItem('token', token);
-	localStorage.setItem('email', email);
+	setStorage('token', token);
+	setStorage('email', email);
 }
 
 export async function register(
@@ -25,15 +42,20 @@ export async function register(
 }
 
 export function logout() {
-	localStorage.removeItem('token');
-	localStorage.removeItem('email');
-	window.location.href = '/';
+	removeStorage('token');
+	removeStorage('email');
+	if (browser) {
+		window.location.href = '/';
+	}
 }
 
 export function isAuthenticated(): boolean {
-	return !!localStorage.getItem('token');
+	return !!getStorage('token');
 }
 
 export function getAuthHeader(): string {
-	return `Basic ${localStorage.getItem('token')}`;
+	const token = getStorage('token');
+	return token ? `Basic ${token}` : '';
 }
+
+export { browser };
