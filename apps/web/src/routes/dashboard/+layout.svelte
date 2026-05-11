@@ -6,74 +6,55 @@
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
-
 	let mounted = $state(false);
-
 	onMount(() => { mounted = true; });
-
-	const navItems = [
-		{ href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-		{ href: '/dashboard', icon: FolderGit2, label: 'Repositories' },
-		{ href: '/dashboard/settings', icon: Settings, label: 'Settings' },
-	] as const;
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-[#050608] p-4 text-white">
-	<!-- Window frame — единая скруглённая рамка как окно монитора -->
-	<div class="flex h-[calc(100vh-32px)] w-full max-w-[1440px] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0c0d0f] shadow-2xl">
-		<!-- Left panel (часть общего окна) -->
-		<aside class="flex w-56 shrink-0 flex-col border-r border-white/[0.06]">
-			<!-- Logo -->
-			<div class="flex items-center gap-3 px-5 py-4">
-				<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 to-rose-600">
-					<Cpu class="h-4 w-4 text-white" />
-				</div>
-				<div class="text-sm font-semibold text-white/90">Forge</div>
+<div class="flex min-h-screen gap-4 bg-[#050608] p-4 text-white">
+	<!-- Sidebar — скруглённая рамка-карточка -->
+	<aside class="flex w-56 shrink-0 flex-col rounded-2xl border border-white/[0.06] bg-[#0c0d0f]">
+		<div class="flex items-center gap-3 px-5 py-4">
+			<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-red-500 to-rose-600">
+				<Cpu class="h-4 w-4 text-white" />
 			</div>
+			<div class="text-sm font-semibold text-white/90">Forge</div>
+		</div>
 
-			<!-- User -->
-			<div class="border-t border-white/[0.06] px-5 py-3">
-				<div class="flex items-center gap-3">
-					<div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/20 text-[11px] font-semibold text-red-400">U</div>
-					<div class="min-w-0 flex-1">
-						<div class="truncate text-sm text-white/70">User</div>
-						<div class="truncate text-[11px] text-white/30">@user</div>
-					</div>
+		<div class="border-t border-white/[0.06] px-5 py-3">
+			<div class="flex items-center gap-3">
+				<div class="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/20 text-[11px] font-semibold text-red-400">U</div>
+				<div class="min-w-0 flex-1">
+					<div class="truncate text-sm text-white/70">User</div>
+					<div class="truncate text-[11px] text-white/30">@user</div>
 				</div>
 			</div>
+		</div>
 
-			<!-- Nav -->
-			<nav class="flex-1 space-y-0.5 px-3 py-3">
-				{#each navItems as { href, icon, label }}
-					<a
-						{href}
-						class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white"
-					>
-						<svelte:component this={icon} class="h-4 w-4" />
-						{label}
-					</a>
-				{/each}
-			</nav>
+		<nav class="flex-1 space-y-0.5 px-3 py-3">
+			<a href="/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
+				<LayoutDashboard class="h-4 w-4" /> Dashboard
+			</a>
+			<a href="/dashboard" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
+				<FolderGit2 class="h-4 w-4" /> Repositories
+			</a>
+			<a href="/dashboard/settings" class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white">
+				<Settings class="h-4 w-4" /> Settings
+			</a>
+		</nav>
 
-			<!-- Logout -->
-			<div class="border-t border-white/[0.06] p-3">
-				<button
-					onclick={logout}
-					class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/40 transition-all hover:bg-white/[0.06] hover:text-red-400"
-				>
-					<LogOut class="h-4 w-4" />
-					Sign out
-				</button>
+		<div class="border-t border-white/[0.06] p-3">
+			<button onclick={logout} class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/40 transition-all hover:bg-white/[0.06] hover:text-red-400">
+				<LogOut class="h-4 w-4" /> Sign out
+			</button>
+		</div>
+	</aside>
+
+	<!-- Main content -->
+	<main class="flex-1 overflow-auto rounded-2xl bg-[#0c0d0f]">
+		{#if mounted}
+			<div in:fade={{ duration: 200, easing: cubicOut }}>
+				{@render children()}
 			</div>
-		</aside>
-
-		<!-- Main content -->
-		<main class="flex-1 overflow-auto bg-[#08090b]">
-			{#if mounted}
-				<div in:fade={{ duration: 200, easing: cubicOut }}>
-					{@render children()}
-				</div>
-			{/if}
-		</main>
-	</div>
+		{/if}
+	</main>
 </div>
