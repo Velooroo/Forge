@@ -1,17 +1,10 @@
-pub struct Repository {
-    id: u32,
-    name: String,
-    description: String,
-    owner_id: u32,
-}
+use sqlx::FromRow;
 
-impl Repository {
-    pub fn new(id: u32, name: String, description: String, owner_id: u32) -> Self {
-        Self {
-            id,
-            name,
-            description,
-            owner_id,
-        }
-    }
+#[derive(Debug, Clone, FromRow)]
+pub struct Repository {
+    pub id: sqlx::types::Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub owner_id: sqlx::types::Uuid,
+    pub visibility: String,
 }

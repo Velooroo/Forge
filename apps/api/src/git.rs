@@ -129,7 +129,6 @@ pub async fn handle_receive_pack(
     State(state): State<Arc<AppState>>,
     body: Bytes,
 ) -> impl IntoResponse {
-    println!("test");
     // Авто-создание репо
     let repo_path = match ensure_repo_exists(&state, &user, &repo).await {
         Ok(p) => p,
