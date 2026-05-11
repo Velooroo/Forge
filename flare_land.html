@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forge — Git Hosting + IDE. Self-Hosted.</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --brand: #f97316;
+      --brand-hot: #ea580c;
+      --brand-glow: #fb923c;
+      --steel: #94a3b8;
+      --steel-light: #cbd5e1;
+      --bg: #0c0c12;
+      --bg-card: rgba(255,255,255,0.035);
+      --text: #e2e8f0;
+      --text-dim: #64748b;
+      --surface: rgba(255,255,255,0.04);
+      --radius: 14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ══════ Background ══════ */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    }
+    .bg-layer .glow {
+      position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.25;
+    }
+    .glow-1 {
+      width: 700px; height: 700px; top: -20%; left: -10%;
+      background: radial-gradient(circle, #f97316, transparent 70%);
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    .glow-2 {
+      width: 500px; height: 500px; bottom: 5%; right: -5%;
+      background: radial-gradient(circle, #dc2626, transparent 70%);
+      animation: drift 18s ease-in-out infinite alternate-reverse;
+    }
+    .glow-3 {
+      width: 350px; height: 350px; top: 45%; left: 55%;
+      background: radial-gradient(circle, #fbbf24, transparent 70%);
+      opacity: 0.12;
+      animation: drift 20s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(50px, -30px) scale(1.1); }
+      100% { transform: translate(-40px, 40px) scale(0.95); }
+    }
+
+    .bg-grid {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 50% at 50% 20%, black 10%, transparent 100%);
+    }
+
+    /* ══════ Particles (forge sparks) ══════ */
+    .sparks {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    }
+    .spark {
+      position: absolute; width: 3px; height: 3px; border-radius: 50%;
+      background: var(--brand); opacity: 0;
+      animation: sparkUp 4s ease-out infinite;
+    }
+    @keyframes sparkUp {
+      0%   { opacity: 0; transform: translateY(0) scale(1); }
+      10%  { opacity: 0.9; }
+      100% { opacity: 0; transform: translateY(-200px) scale(0); }
+    }
+
+    /* ══════ Nav ══════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 18px 40px; display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(24px); background: rgba(12,12,18,0.65);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .logo {
+      font-size: 1.4rem; font-weight: 900; letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand), #dc2626);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .logo-text { color: var(--text); }
+    .logo-text span { color: var(--brand); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none; font-size: 0.88rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 9px 22px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--brand), #dc2626);
+      color: #fff; font-weight: 600; font-size: 0.88rem;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(249,115,22,0.4);
+    }
+
+    /* ══════ Hero ══════ */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 130px 40px 80px;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 7px 20px; border-radius: 100px;
+      background: rgba(249,115,22,0.08); border: 1px solid rgba(249,115,22,0.18);
+      font-size: 0.82rem; color: var(--brand-glow); font-weight: 500;
+      margin-bottom: 28px;
+      animation: fadeUp 0.7s ease-out;
+    }
+    .hero-tag .pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--brand);
+      animation: live 2s ease-in-out infinite;
+    }
+    @keyframes live {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(249,115,22,0.6); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(249,115,22,0); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 7.5vw, 5.5rem); font-weight: 900;
+      letter-spacing: -2px; line-height: 1.05; margin-bottom: 24px;
+      animation: fadeUp 0.7s ease-out 0.08s both;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #f97316, #dc2626, #fbbf24);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(1.05rem, 2vw, 1.3rem);
+      color: var(--text-dim); max-width: 580px;
+      margin-bottom: 44px;
+      animation: fadeUp 0.7s ease-out 0.16s both;
+    }
+    .hero-sub strong { color: var(--steel-light); font-weight: 600; }
+    .hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 0.7s ease-out 0.24s both;
+    }
+    .btn-hot {
+      padding: 15px 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), #dc2626);
+      color: #fff; font-weight: 700; font-size: 1rem;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-hot:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(249,115,22,0.45);
+    }
+    .btn-ghost {
+      padding: 15px 38px; border-radius: 12px;
+      background: var(--surface); border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text); font-weight: 600; font-size: 1rem;
+      cursor: pointer; text-decoration: none;
+      transition: transform 0.2s, border-color 0.2s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-ghost:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.18);
+    }
+
+    /* ══════ Forge demo (git diff card) ══════ */
+    .demo-card {
+      margin-top: 64px; width: 100%; max-width: 740px;
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(14,14,20,0.92); backdrop-filter: blur(12px);
+      animation: fadeUp 0.7s ease-out 0.32s both;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+    .demo-bar {
+      padding: 13px 20px; display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.025);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .demo-dot.r { background: #ff5f57; }
+    .demo-dot.y { background: #febc2e; }
+    .demo-dot.g { background: #28c840; }
+    .demo-bar .title {
+      margin-left: 10px; font-size: 0.78rem; color: var(--text-dim);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .demo-bar .badge {
+      margin-left: auto; padding: 3px 10px; border-radius: 6px;
+      background: rgba(249,115,22,0.12); color: var(--brand-glow);
+      font-size: 0.72rem; font-weight: 600; font-family: monospace;
+    }
+    .demo-body {
+      padding: 22px 24px; font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.82rem; line-height: 1.85;
+    }
+    .demo-body .diff-header { color: var(--brand-glow); font-weight: 600; }
+    .demo-body .diff-file { color: #8be9fd; }
+    .demo-body .diff-add { color: #50fa7b; }
+    .demo-body .diff-del { color: #ff5555; }
+    .demo-body .diff-ctx { color: var(--text-dim); }
+    .demo-body .diff-stat { color: #bd93f9; }
+    .demo-body .cursor-blink {
+      display: inline-block; width: 8px; height: 15px;
+      background: var(--brand); vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ══════ Sections shared ══════ */
+    .section {
+      padding: 110px 40px; max-width: 1200px; margin: 0 auto;
+    }
+    .section-head {
+      text-align: center; margin-bottom: 64px;
+    }
+    .section-head .label {
+      display: inline-block; padding: 5px 14px; border-radius: 6px;
+      background: rgba(249,115,22,0.1); color: var(--brand-glow);
+      font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1.5px; margin-bottom: 18px;
+    }
+    .section-head h2 {
+      font-size: clamp(2rem, 4.5vw, 3rem); font-weight: 800;
+      letter-spacing: -1px; margin-bottom: 14px;
+    }
+    .section-head p {
+      font-size: 1.1rem; color: var(--text-dim); max-width: 520px; margin: 0 auto;
+    }
+
+    /* ══════ Feature grid ══════ */
+    .feat-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .feat {
+      padding: 32px; border-radius: var(--radius);
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .feat::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--brand), #dc2626);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feat:hover {
+      transform: translateY(-4px);
+      border-color: rgba(249,115,22,0.18);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+    .feat:hover::after { opacity: 1; }
+    .feat-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 18px;
+      background: rgba(249,115,22,0.08);
+    }
+    .feat h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    .feat p { font-size: 0.9rem; color: var(--text-dim); line-height: 1.7; }
+
+    /* ── Big feature (2-col span) ── */
+    .feat.wide { grid-column: span 2; }
+    .feat.wide .feat-inner { display: flex; gap: 32px; align-items: flex-start; }
+    .feat.wide .feat-text { flex: 1; }
+    .feat.wide .feat-visual {
+      flex-shrink: 0; width: 280px; padding: 16px;
+      border-radius: 10px; background: rgba(0,0,0,0.3);
+      font-family: 'SF Mono', monospace; font-size: 0.75rem; line-height: 1.6;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .feat-visual .ln-add { color: #50fa7b; }
+    .feat-visual .ln-del { color: #ff5555; }
+    .feat-visual .ln-hunk { color: var(--brand-glow); }
+
+    /* ══════ IDE mockup ══════ */
+    .ide-wrapper {
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(14,14,20,0.95);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    }
+    .ide-tabs {
+      padding: 10px 16px; display: flex; gap: 4px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .ide-tab {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.78rem;
+      font-family: monospace; color: var(--text-dim);
+      background: transparent; border: 1px solid transparent; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .ide-tab.on {
+      background: rgba(255,255,255,0.05); color: var(--text);
+      border-color: rgba(255,255,255,0.08);
+    }
+    .ide-body { display: flex; min-height: 320px; }
+    .ide-tree {
+      width: 200px; padding: 14px 0; border-right: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.78rem; flex-shrink: 0;
+    }
+    .tree-hdr { padding: 4px 14px; color: var(--text-dim); font-weight: 700; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.2px; }
+    .tree-item {
+      padding: 4px 14px 4px 26px; color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; gap: 7px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .tree-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+    .tree-item.on { background: rgba(249,115,22,0.08); color: var(--brand-glow); }
+    .tree-item i { font-style: normal; font-size: 0.85rem; opacity: 0.5; }
+    .ide-code {
+      flex: 1; padding: 18px; font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.82rem; line-height: 1.75; counter-reset: line; overflow-x: auto;
+    }
+    .ide-code .cl {
+      display: block; padding-left: 46px; position: relative; white-space: pre;
+    }
+    .ide-code .cl::before {
+      counter-increment: line; content: counter(line);
+      position: absolute; left: 0; width: 36px; text-align: right;
+      color: rgba(255,255,255,0.12); font-size: 0.75rem;
+    }
+    .k { color: #ff79c6; }
+    .f { color: #8be9fd; }
+    .s { color: #f1fa8c; }
+    .t { color: #8be9fd; font-style: italic; }
+    .c { color: #5a6578; }
+    .n { color: #bd93f9; }
+    .a { color: #f97316; }
+
+    /* ══════ Comparison table ══════ */
+    .compare-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .compare-table th, .compare-table td {
+      padding: 16px 24px; text-align: left; font-size: 0.9rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .compare-table th {
+      background: rgba(255,255,255,0.03); font-weight: 700;
+      color: var(--text-dim); font-size: 0.82rem; text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .compare-table th.forge-col {
+      background: rgba(249,115,22,0.08); color: var(--brand-glow);
+    }
+    .compare-table td { color: var(--text-dim); }
+    .compare-table td.forge-col {
+      background: rgba(249,115,22,0.04); color: var(--text); font-weight: 500;
+    }
+    .check { color: #50fa7b; font-weight: 700; }
+    .cross { color: #64748b; }
+    .partial { color: #fbbf24; }
+
+    /* ══════ Stats ══════ */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+      padding: 80px 0;
+    }
+    .stat-card {
+      text-align: center; padding: 32px; border-radius: var(--radius);
+      background: var(--bg-card); border: 1px solid rgba(255,255,255,0.04);
+    }
+    .stat-card h3 {
+      font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 900;
+      background: linear-gradient(135deg, var(--brand), #dc2626);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-card p { color: var(--text-dim); font-size: 0.88rem; margin-top: 4px; }
+
+    /* ══════ CTA ══════ */
+    .cta-section {
+      padding: 100px 40px; text-align: center;
+    }
+    .cta-card {
+      max-width: 680px; margin: 0 auto; padding: 60px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(249,115,22,0.07), rgba(220,38,38,0.07));
+      border: 1px solid rgba(249,115,22,0.12);
+      position: relative; overflow: hidden;
+    }
+    .cta-card::before {
+      content: ''; position: absolute; inset: -2px;
+      background: linear-gradient(135deg, rgba(249,115,22,0.25), rgba(220,38,38,0.25));
+      border-radius: 20px; filter: blur(50px); opacity: 0.25; z-index: -1;
+    }
+    .cta-card h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 800;
+      margin-bottom: 14px; letter-spacing: -0.5px;
+    }
+    .cta-card p {
+      font-size: 1.05rem; color: var(--text-dim); margin-bottom: 32px;
+    }
+    .cta-code {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 24px; border-radius: 10px;
+      background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08);
+      font-family: 'SF Mono', monospace; font-size: 0.88rem;
+      color: var(--brand-glow); margin-bottom: 24px;
+    }
+    .cta-code .dollar { color: var(--text-dim); }
+
+    /* ══════ Footer ══════ */
+    footer {
+      padding: 40px; text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-dim); font-size: 0.82rem;
+    }
+    footer a { color: var(--brand); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    footer .links { margin-top: 10px; display: flex; gap: 20px; justify-content: center; }
+
+    /* ══════ Animations ══════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(36px);
+      transition: opacity 0.65s ease-out, transform 0.65s ease-out;
+    }
+    .reveal.vis { opacity: 1; transform: translateY(0); }
+
+    /* ══════ Responsive ══════ */
+    @media (max-width: 900px) {
+      .feat-grid { grid-template-columns: 1fr; }
+      .feat.wide { grid-column: span 1; }
+      .feat.wide .feat-inner { flex-direction: column; }
+      .feat.wide .feat-visual { width: 100%; }
+      .ide-tree { display: none; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .section { padding: 70px 20px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .compare-table { font-size: 0.78rem; }
+      .compare-table th, .compare-table td { padding: 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BG -->
+  <div class="bg-layer">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+  </div>
+  <div class="bg-grid"></div>
+  <div class="sparks" id="sparks"></div>
+
+  <!-- Nav -->
+  <nav>
+    <div class="logo">
+      <div class="logo-icon">⚒</div>
+      <div class="logo-text"><span>Forge</span>.dev</div>
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#editor">Editor</a>
+      <a href="#compare">Compare</a>
+      <a href="https://github.com/Velooroo/Forge" target="_blank">GitHub</a>
+      <a href="#" class="nav-cta">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">
+      <span class="pulse"></span>
+      Self-Hosted &middot; Open Source &middot; Rust + SvelteKit
+    </div>
+    <h1>Your code.<br>Your server.<br><em>Your forge.</em></h1>
+    <p class="hero-sub">
+      <strong>GitLab meets Replit</strong> — host git repos, edit code in the browser, spin up terminals. All self-hosted. All yours.
+    </p>
+    <div class="hero-btns">
+      <a href="#" class="btn-hot">⚒ Deploy Forge</a>
+      <a href="#features" class="btn-ghost">↓ See how it works</a>
+    </div>
+
+    <!-- Demo: git diff card -->
+    <div class="demo-card">
+      <div class="demo-bar">
+        <div class="demo-dot r"></div>
+        <div class="demo-dot y"></div>
+        <div class="demo-dot g"></div>
+        <span class="title">GET /api/tree/kazilsky/site/diff?from=main&amp;to=feature/auth</span>
+        <span class="badge">200 OK</span>
+      </div>
+      <div class="demo-body">
+        <div class="diff-header">diff --numstat main..feature/auth</div>
+        <div><span class="diff-stat">3  0</span>  <span class="diff-file">src/main.rs</span></div>
+        <div><span class="diff-stat">12 4</span>  <span class="diff-file">src/handlers/auth.rs</span></div>
+        <div><span class="diff-stat">0  8</span>  <span class="diff-file">src/legacy_auth.rs</span></div>
+        <div class="diff-header" style="margin-top:8px;">diff --name-status main..feature/auth</div>
+        <div><span class="diff-add">M</span>  src/main.rs</div>
+        <div><span class="diff-add">M</span>  src/handlers/auth.rs</div>
+        <div><span class="diff-del">D</span>  src/legacy_auth.rs</div>
+        <div style="margin-top:10px; color: var(--text-dim);">3 files changed, 15 insertions(+), 12 deletions(-)<span class="cursor-blink"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="section-head reveal">
+      <span class="label">Features</span>
+      <h2>Not just git hosting.<br>A full dev platform.</h2>
+      <p>Forge combines repository management, a browser IDE, and containerized workspaces into one seamless experience.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat wide reveal">
+        <div class="feat-inner">
+          <div class="feat-text">
+            <div class="feat-icon">🔀</div>
+            <h3>Structured Git Diff API</h3>
+            <p>Compare branches, commits, or tags with a single API call. Get per-file stats (insertions, deletions), detect renames and binary files, filter by path — all parsed from <code>--numstat</code> and <code>--name-status</code> for rock-solid reliability.</p>
+          </div>
+          <div class="feat-visual">
+            <div class="ln-hunk">@@ -1,5 +1,8 @@</div>
+            <div class="ln-ctx"> use axum::Router;</div>
+            <div class="ln-del">-use old_auth::Auth;</div>
+            <div class="ln-add">+use forge_auth::{Auth, Session};</div>
+            <div class="ln-add">+use crate::handlers::diff;</div>
+            <div class="ln-ctx"></div>
+            <div class="ln-add">+let diff = get_diff(state, query);</div>
+          </div>
+        </div>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">✏️</div>
+        <h3>CodeMirror 6 Editor</h3>
+        <p>Full-featured in-browser editor with syntax highlighting, multi-cursor, Vim mode, and autocomplete. Not a toy — a real dev tool.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">⚡</div>
+        <h3>Docker Workspaces</h3>
+        <p>Every project gets an isolated container. Real terminal, real filesystem, real processes. Spin up in under 2 seconds.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🔥</div>
+        <h3>Git as Persistence</h3>
+        <p>Every file save is a commit. Every branch is a workspace. Your code lives in git — no proprietary lock-in. Clone anywhere.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🔐</div>
+        <h3>Argon2 + JWT Auth</h3>
+        <p>Secure password hashing with Argon2, token-based API access with JWT, and Basic Auth for git operations. Enterprise-grade security.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🧩</div>
+        <h3>Smart HTTP Git</h3>
+        <p>Clone and push over HTTP. No SSH keys to manage. Works behind corporate proxies and firewalls out of the box.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="feat-icon">🔄</div>
+        <h3>Optimistic Locking</h3>
+        <p>SHA-based conflict detection on every file write. No silent overwrites — if someone changed the file, you'll know before committing.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editor Mockup -->
+  <section class="section" id="editor">
+    <div class="section-head reveal">
+      <span class="label">Editor</span>
+      <h2>Write code where it lives</h2>
+      <p>No more cloning, editing locally, and pushing back. Open any file right in the browser.</p>
+    </div>
+    <div class="ide-wrapper reveal">
+      <div class="ide-tabs">
+        <div class="ide-tab on">handlers/tree.rs</div>
+        <div class="ide-tab">handlers/auth.rs</div>
+        <div class="ide-tab">git.rs</div>
+        <div class="ide-tab">Cargo.toml</div>
+      </div>
+      <div class="ide-body">
+        <div class="ide-tree">
+          <div class="tree-hdr">Explorer</div>
+          <div class="tree-item"><i>📂</i> src</div>
+          <div class="tree-item"><i>📂</i> handlers</div>
+          <div class="tree-item on"><i>🦀</i> tree.rs</div>
+          <div class="tree-item"><i>🦀</i> auth.rs</div>
+          <div class="tree-item"><i>🦀</i> git.rs</div>
+          <div class="tree-item"><i>🦀</i> main.rs</div>
+          <div class="tree-item"><i>📄</i> Cargo.toml</div>
+          <div class="tree-hdr" style="margin-top:12px">Git</div>
+          <div class="tree-item on"><i>🔀</i> main</div>
+          <div class="tree-item"><i>🌿</i> feature/diff</div>
+          <div class="tree-item"><i>🌿</i> feature/ws</div>
+        </div>
+        <div class="ide-code">
+          <span class="cl"><span class="k">pub struct</span> <span class="t">DiffResponse</span> {</span>
+          <span class="cl">    <span class="a">diff</span>: String,</span>
+          <span class="cl">    <span class="a">files_changed</span>: i64,</span>
+          <span class="cl">    <span class="a">insertions</span>: i64,</span>
+          <span class="cl">    <span class="a">deletions</span>: i64,</span>
+          <span class="cl">    <span class="a">files</span>: Vec&lt;FileDiff&gt;,</span>
+          <span class="cl">}</span>
+          <span class="cl"></span>
+          <span class="cl"><span class="k">pub struct</span> <span class="t">FileDiff</span> {</span>
+          <span class="cl">    <span class="a">path</span>: String,</span>
+          <span class="cl">    <span class="a">old_path</span>: Option&lt;String&gt;,</span>
+          <span class="cl">    <span class="a">status</span>: String, <span class="c">// added|modified|deleted|renamed</span></span>
+          <span class="cl">    <span class="a">insertions</span>: i64,</span>
+          <span class="cl">    <span class="a">deletions</span>: i64,</span>
+          <span class="cl">    <span class="a">is_binary</span>: bool,</span>
+          <span class="cl">}</span>
+          <span class="cl"></span>
+          <span class="cl"><span class="c">// Uses --numstat + --name-status for reliable parsing</span></span>
+          <span class="cl"><span class="k">async fn</span> <span class="f">get_diff</span>(...) -&gt; <span class="t">impl IntoResponse</span> {</span>
+          <span class="cl">    <span class="k">let</span> files = <span class="f">parse_numstat</span>(numstat_out);</span>
+          <span class="cl">    <span class="k">let</span> statuses = <span class="f">parse_name_status</span>(status_out);</span>
+          <span class="cl">    Json(DiffResponse { files, .. })</span>
+          <span class="cl">}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compare -->
+  <section class="section" id="compare">
+    <div class="section-head reveal">
+      <span class="label">Compare</span>
+      <h2>Why Forge?</h2>
+      <p>Everything you need in one place. No more stitching together five different tools.</p>
+    </div>
+    <div class="reveal">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>GitLab</th>
+            <th>GitHub</th>
+            <th>Replit</th>
+            <th class="forge-col">Forge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Self-hosted</td>
+            <td><span class="partial">△</span></td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="cross">✕</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>In-browser IDE</td>
+            <td><span class="partial">△</span></td>
+            <td><span class="partial">△</span></td>
+            <td><span class="check">✓</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Container workspaces</td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="partial">△</span></td>
+            <td><span class="check">✓</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Git-first persistence</td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="cross">✕</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Diff API (structured)</td>
+            <td><span class="partial">△</span></td>
+            <td><span class="partial">△</span></td>
+            <td><span class="cross">✕</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Zero dependencies</td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="cross">✕</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Open source</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="cross">✕</span></td>
+            <td><span class="cross">✕</span></td>
+            <td class="forge-col"><span class="check">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="section">
+    <div class="stats-row reveal">
+      <div class="stat-card">
+        <h3>100%</h3>
+        <p>Self-hosted</p>
+      </div>
+      <div class="stat-card">
+        <h3>&lt;2s</h3>
+        <p>Workspace boot</p>
+      </div>
+      <div class="stat-card">
+        <h3>Rust</h3>
+        <p>Axum backend</p>
+      </div>
+      <div class="stat-card">
+        <h3>0</h3>
+        <p>External deps</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-card reveal">
+      <h2>Ready to forge?</h2>
+      <p>Deploy on your server in under 5 minutes. Docker, bare metal, VPS — whatever you've got.</p>
+      <div class="cta-code">
+        <span class="dollar">$</span> docker run -p 8080:8080 forge/dev
+      </div>
+      <br>
+      <a href="#" class="btn-hot">⚒ Get Started</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>Forge is open source under MIT license. Built with Rust, SvelteKit, and a lot of coffee.</p>
+    <div class="links">
+      <a href="https://github.com/Velooroo/Forge" target="_blank">GitHub</a>
+      <a href="#">Docs</a>
+      <a href="#">Issues</a>
+      <a href="#">Discord</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── Scroll reveal ──
+    const revealEls = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('vis'), i * 60);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => obs.observe(el));
+
+    // ── Forge sparks ──
+    const sparksEl = document.getElementById('sparks');
+    function spawnSpark() {
+      const s = document.createElement('div');
+      s.className = 'spark';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.bottom = Math.random() * 30 + '%';
+      s.style.animationDuration = (2 + Math.random() * 3) + 's';
+      s.style.animationDelay = Math.random() * 2 + 's';
+      s.style.width = s.style.height = (2 + Math.random() * 3) + 'px';
+      const colors = ['#f97316', '#fb923c', '#fbbf24', '#dc2626'];
+      s.style.background = colors[Math.floor(Math.random() * colors.length)];
+      sparksEl.appendChild(s);
+      setTimeout(() => s.remove(), 6000);
+    }
+    setInterval(spawnSpark, 300);
+
+    // ── Typing effect in terminal ──
+    const termBody = document.querySelector('.demo-body');
+    if (termBody) {
+      termBody.style.opacity = '0';
+      setTimeout(() => {
+        termBody.style.transition = 'opacity 0.5s';
+        termBody.style.opacity = '1';
+      }, 800);
+    }
+  </script>
+</body>
+</html>

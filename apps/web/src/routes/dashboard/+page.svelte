@@ -56,7 +56,7 @@
 	<div class="mb-6 flex items-center justify-between">
 		<div>
 			<h1 class="text-2xl font-bold tracking-tight">Repositories</h1>
-			<p class="mt-1 text-sm text-gray-400">Manage your Git repositories</p>
+			<p class="mt-1 text-sm text-white/40">Manage your Git repositories</p>
 		</div>
 		<button
 			onclick={() => (showCreate = true)}
@@ -70,56 +70,56 @@
 	<!-- CREATE MODAL -->
 	{#if showCreate}
 		<div
-			class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 			onclick={() => (showCreate = false)}
 			role="presentation"
 		>
 			<div
 				transition:scale={{ duration: 200, easing: quintOut, start: 0.95 }}
-				class="w-full max-w-lg rounded-3xl border border-gray-200 bg-gray-50/80 p-8 shadow-2xl"
+				class="w-full max-w-lg rounded-3xl border border-white/10 bg-[#0a0e10] p-8 shadow-2xl"
 				onclick={(e) => e.stopPropagation()}
 				role="presentation"
 			>
 				<h2 class="text-xl font-bold">Create Repository</h2>
-				<p class="mt-1 text-sm text-gray-400">A new Git repo will be created on the server</p>
+				<p class="mt-1 text-sm text-white/40">A new Git repo will be created on the server</p>
 
 				<div class="mt-6 space-y-4">
 					<div>
-						<label class="mb-1.5 block text-xs font-medium text-gray-500">Name</label>
+						<label class="mb-1.5 block text-xs font-medium text-white/60">Name</label>
 						<input
 							type="text"
 							placeholder="my-awesome-project"
 							bind:value={newName}
-							class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-300 transition-all focus:border-red-400/40 focus:bg-gray-100 focus:outline-none focus:ring-red-500/20"
+							class="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder-white/25 transition-all focus:border-red-400/40 focus:bg-white/10 focus:outline-none focus:ring-red-500/20"
 						/>
 					</div>
 					<div>
-						<label class="mb-1.5 block text-xs font-medium text-gray-500">Description (optional)</label>
+						<label class="mb-1.5 block text-xs font-medium text-white/60">Description (optional)</label>
 						<input
 							type="text"
 							placeholder="What does this project do?"
 							bind:value={newDesc}
-							class="h-12 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-300 transition-all focus:border-red-400/40 focus:bg-gray-100 focus:outline-none focus:ring-red-500/20"
+							class="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder-white/25 transition-all focus:border-red-400/40 focus:bg-white/10 focus:outline-none focus:ring-red-500/20"
 						/>
 					</div>
 					<div>
-						<label class="mb-1.5 block text-xs font-medium text-gray-500">Visibility</label>
+						<label class="mb-1.5 block text-xs font-medium text-white/60">Visibility</label>
 						<div class="grid grid-cols-3 gap-2">
 							<button
 								onclick={() => (newVis = 'private')}
-								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'private' ? 'border-red-400/40 bg-red-500/10' : 'border-gray-200 bg-gray-50'}"
+								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'private' ? 'border-red-400/40 bg-red-500/10' : 'border-white/10 bg-white/5'}"
 							>
 								<Lock class="h-3 w-3" /> Private
 							</button>
 							<button
 								onclick={() => (newVis = 'internal')}
-								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'internal' ? 'border-red-400/40 bg-red-500/10' : 'border-gray-200 bg-gray-50'}"
+								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'internal' ? 'border-red-400/40 bg-red-500/10' : 'border-white/10 bg-white/5'}"
 							>
 								<Eye class="h-3 w-3" /> Internal
 							</button>
 							<button
 								onclick={() => (newVis = 'public')}
-								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'public' ? 'border-red-400/40 bg-red-500/10' : 'border-gray-200 bg-gray-50'}"
+								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'public' ? 'border-red-400/40 bg-red-500/10' : 'border-white/10 bg-white/5'}"
 							>
 								<Globe class="h-3 w-3" /> Public
 							</button>
@@ -130,7 +130,7 @@
 				<div class="mt-8 flex items-center justify-end gap-3">
 					<button
 						onclick={() => (showCreate = false)}
-						class="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900"
+						class="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-medium text-white/60 transition-all hover:bg-white/5 hover:text-white"
 					>
 						Cancel
 					</button>
@@ -152,7 +152,7 @@
 			<div class="h-8 w-8 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
 		</div>
 	{:else if filtered.length === 0}
-		<div class="flex flex-col items-center justify-center py-20 text-gray-300">
+		<div class="flex flex-col items-center justify-center py-20 text-white/30">
 			<FolderGit2 class="mb-4 h-12 w-12" />
 			<p class="text-lg font-medium">No repositories yet</p>
 			<p class="mt-1 text-sm">Create your first repository to get started</p>
@@ -161,7 +161,7 @@
 		<div class="grid gap-3">
 			{#each filtered as repo, i (repo.id)}
 				<div
-					class="group flex items-center gap-4 rounded-2xl border border-gray-200 bg-gray-50/80 p-4 transition-all hover:border-white/20 hover:bg-white/[0.07]"
+					class="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition-all hover:border-white/20 hover:bg-white/[0.07]"
 					in:fade={{ duration: 300, delay: i * 50, easing: cubicOut }}
 				>
 					<div
@@ -173,29 +173,29 @@
 					<div class="min-w-0 flex-1">
 						<a
 							href="/dashboard/kazilsky/{repo.name}"
-							class="font-medium text-gray-800 transition-colors hover:text-red-400"
+							class="font-medium text-white/80 transition-colors hover:text-red-400"
 						>
 							{repo.name}
 						</a>
 						{#if repo.description}
-							<p class="mt-0.5 truncate text-sm text-gray-400">{repo.description}</p>
+							<p class="mt-0.5 truncate text-sm text-white/40">{repo.description}</p>
 						{/if}
 					</div>
 
 					<div class="hidden items-center gap-4 sm:flex">
 						<span
-							class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'private' ? 'border-gray-200 text-gray-400' : repo.visibility === 'public' ? 'border-red-400/20 text-red-400/60' : 'border-blue-400/20 text-blue-400/60'}"
+							class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'private' ? 'border-white/10 text-white/40' : repo.visibility === 'public' ? 'border-red-400/20 text-red-400/60' : 'border-blue-400/20 text-blue-400/60'}"
 						>
 							{repo.visibility}
 						</span>
-						<code class="rounded-lg bg-gray-50 px-3 py-1.5 text-xs text-gray-300 font-mono">
+						<code class="rounded-lg bg-white/5 px-3 py-1.5 text-xs text-white/30 font-mono">
 							{repo.clone_url}
 						</code>
 					</div>
 
 					<a
 						href="/dashboard/kazilsky/{repo.name}"
-						class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 transition-all hover:bg-gray-100 hover:text-red-400"
+						class="flex h-8 w-8 items-center justify-center rounded-lg text-white/20 transition-all hover:bg-white/10 hover:text-red-400"
 					>
 						<ArrowRight class="h-4 w-4" />
 					</a>
