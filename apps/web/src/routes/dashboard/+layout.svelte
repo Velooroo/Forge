@@ -1,116 +1,76 @@
 <script lang="ts">
-	import { LogOut, Cpu, LayoutDashboard, FolderGit2, Settings, User, Key } from 'lucide-svelte';
+	import { LogOut, Cpu, LayoutDashboard, FolderGit2, Settings, User, Key, ChevronRight } from 'lucide-svelte';
 	import { logout } from '../../api/auth';
-	import { fade, slide } from 'svelte/transition';
-	import { cubicOut, quintOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
-	let activePanel = $state<'none' | 'nav' | 'files' | 'settings'>('none');
 	let mounted = $state(false);
 
 	onMount(() => { mounted = true; });
 
-	function togglePanel(panel: 'nav' | 'files' | 'settings') {
-		activePanel = activePanel === panel ? 'none' : panel;
-	}
+	const navItems: { href: string; icon: typeof LayoutDashboard; label: string }[] = [
+		{ href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+		{ href: '/dashboard', icon: FolderGit2, label: 'Repositories' },
+		{ href: '/dashboard/settings', icon: Settings, label: 'Settings' },
+	];
 </script>
 
 <div class="flex min-h-screen bg-[#08090b] text-white">
-	<!-- ACTIVITY RAIL -->
-	<aside class="flex w-[52px] shrink-0 flex-col items-center border-r border-white/[0.06] bg-[#0c0d0f] py-3">
-		<button
-			onclick={() => window.location.href = '/dashboard'}
-			class="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/20"
-		>
-			<Cpu class="h-4 w-4 text-white" />
-		</button>
-
-		<div class="flex flex-col items-center gap-1">
-			<button
-				onclick={() => togglePanel('nav')}
-				class="flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-150 {activePanel === 'nav' ? 'bg-red-500/10 text-red-400' : 'bg-white/[0.04] text-white/40 hover:bg-white/10 hover:text-white'}"
-			>
-				<LayoutDashboard class="h-[18px] w-[18px]" />
-			</button>
-			<button
-				onclick={() => togglePanel('files')}
-				class="flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-150 {activePanel === 'files' ? 'bg-red-500/10 text-red-400' : 'bg-white/[0.04] text-white/40 hover:bg-white/10 hover:text-white'}"
-			>
-				<FolderGit2 class="h-[18px] w-[18px]" />
-			</button>
+	<!-- SIDEBAR (GitLab-style) -->
+	<aside
+		class="relative flex w-60 shrink-0 flex-col overflow-hidden rounded-r-2xl border-r border-white/[0.06] bg-[#0c0d0f]"
+	>
+		<!-- Logo area -->
+		<div class="flex items-center gap-3 border-b border-white/[0.06] px-5 py-4">
+			<div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-rose-600 shadow-lg shadow-red-500/20">
+				<Cpu class="h-[18px] w-[18px] text-white" />
+			</div>
+			<div>
+				<div class="text-sm font-semibold text-white/90">Forge</div>
+				<div class="text-[11px] text-white/30">Git control plane</div>
+			</div>
 		</div>
 
-		<div class="mt-auto flex flex-col items-center gap-1">
-			<button
-				onclick={() => togglePanel('settings')}
-				class="flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-150 {activePanel === 'settings' ? 'bg-red-500/10 text-red-400' : 'bg-white/[0.04] text-white/40 hover:bg-white/10 hover:text-white'}"
-			>
-				<Settings class="h-[18px] w-[18px]" />
-			</button>
+		<!-- User context -->
+		<div class="border-b border-white/[0.06] px-5 py-3">
+			<div class="flex items-center gap-3">
+				<div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 text-xs font-semibold text-red-400">
+					U
+				</div>
+				<div class="min-w-0 flex-1">
+					<div class="truncate text-sm text-white/80">User</div>
+					<div class="truncate text-[11px] text-white/30">@user</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Navigation -->
+		<nav class="flex-1 space-y-0.5 px-3 py-4">
+			{#each navItems as item}
+				<a
+					href={item.href}
+					class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/50 transition-all hover:bg-white/[0.06] hover:text-white"
+				>
+					<svelte:component this={item.icon} class="h-4 w-4" />
+					<span>{item.label}</span>
+				</a>
+			{/each}
+		</nav>
+
+		<!-- Bottom actions -->
+		<div class="border-t border-white/[0.06] p-3">
 			<button
 				onclick={logout}
-				class="flex h-9 w-9 items-center justify-center rounded-lg text-white/30 transition-all hover:bg-white/10 hover:text-red-400"
+				class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/40 transition-all hover:bg-white/[0.06] hover:text-red-400"
 			>
-				<LogOut class="h-[18px] w-[18px]" />
+				<LogOut class="h-4 w-4" />
+				<span>Sign out</span>
 			</button>
 		</div>
 	</aside>
-
-	<!-- OVERLAY SIDEBAR -->
-	{#if activePanel !== 'none'}
-		<div
-			class="w-72 shrink-0 border-r border-white/[0.06] bg-[#0c0d0f] overflow-y-auto"
-			transition:slide={{ duration: 200, easing: quintOut, axis: 'x' }}
-		>
-			{#if activePanel === 'nav'}
-				<nav class="p-3 space-y-0.5">
-					<div class="mb-2 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30">Navigate</div>
-					<a href="/dashboard"
-						class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/60 transition-all hover:bg-white/[0.06] hover:text-white"
-					>
-						<LayoutDashboard class="h-4 w-4" />
-						Dashboard
-					</a>
-					<a href="/dashboard"
-						class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/60 transition-all hover:bg-white/[0.06] hover:text-white"
-					>
-						<FolderGit2 class="h-4 w-4" />
-						Repositories
-					</a>
-					<a href="/dashboard/settings"
-						class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/60 transition-all hover:bg-white/[0.06] hover:text-white"
-					>
-						<Settings class="h-4 w-4" />
-						Settings
-					</a>
-				</nav>
-			{:else if activePanel === 'files'}
-				<div class="p-3">
-					<div class="mb-2 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30">Files</div>
-					<p class="px-3 text-xs text-white/20">Open a repository to browse files</p>
-				</div>
-			{:else if activePanel === 'settings'}
-				<nav class="p-3 space-y-0.5">
-					<div class="mb-2 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30">Settings</div>
-					<a href="/dashboard/settings"
-						class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/60 transition-all hover:bg-white/[0.06] hover:text-white"
-					>
-						<User class="h-4 w-4" />
-						Account
-					</a>
-					<button disabled
-						class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/30 transition-all cursor-not-allowed"
-					>
-						<Key class="h-4 w-4" />
-						Access Tokens
-						<span class="ml-auto text-[10px] text-white/20">soon</span>
-					</button>
-				</nav>
-			{/if}
-		</div>
-	{/if}
 
 	<!-- MAIN -->
 	<main class="flex-1 overflow-auto">
