@@ -20,8 +20,8 @@
 	<div class="max-w-2xl space-y-6">
 		<div class="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
 			<div class="flex items-center gap-3">
-				<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10">
-					<User class="h-5 w-5 text-emerald-400/60" />
+				<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-400/10">
+					<User class="h-5 w-5 text-red-400/60" />
 				</div>
 				<div>
 					<h2 class="font-semibold">Profile</h2>

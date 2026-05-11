@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fade, slide, scale } from 'svelte/transition';
 	import { cubicOut, quintOut } from 'svelte/easing';
-	import { Plus, FolderGit2, Globe, Lock, Eye, ArrowRight, GitFork, Search, Cpu } from 'lucide-svelte';
+	import { Plus, FolderGit2, Globe, Lock, Eye, ArrowRight, GitFork, Search, Cpu, X } from 'lucide-svelte';
 	import { listRepos, createRepo, type Repo } from '../../api/repos';
 	import { isAuthenticated } from '../../api/auth';
 
@@ -61,7 +61,7 @@
 		</div>
 		<button
 			onclick={() => (showCreate = true)}
-			class="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/15 transition-all hover:scale-[1.02] hover:shadow-emerald-500/25"
+			class="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-red-500 to-rose-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-red-500/15 transition-all hover:scale-[1.02] hover:shadow-red-500/25"
 		>
 			<Plus class="h-4 w-4" />
 			New Repository
@@ -75,7 +75,7 @@
 			type="text"
 			placeholder="Search repositories..."
 			bind:value={searchQuery}
-			class="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder-white/25 transition-all focus:border-emerald-400/40 focus:bg-white/10 focus:outline-none focus:ring-emerald-500/20"
+			class="h-11 w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder-white/25 transition-all focus:border-red-400/40 focus:bg-white/10 focus:outline-none focus:ring-red-500/20"
 		/>
 	</div>
 
@@ -102,7 +102,7 @@
 							type="text"
 							placeholder="my-awesome-project"
 							bind:value={newName}
-							class="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder-white/25 transition-all focus:border-emerald-400/40 focus:bg-white/10 focus:outline-none focus:ring-emerald-500/20"
+							class="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder-white/25 transition-all focus:border-red-400/40 focus:bg-white/10 focus:outline-none focus:ring-red-500/20"
 						/>
 					</div>
 					<div>
@@ -111,7 +111,7 @@
 							type="text"
 							placeholder="What does this project do?"
 							bind:value={newDesc}
-							class="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder-white/25 transition-all focus:border-emerald-400/40 focus:bg-white/10 focus:outline-none focus:ring-emerald-500/20"
+							class="h-12 w-full rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white placeholder-white/25 transition-all focus:border-red-400/40 focus:bg-white/10 focus:outline-none focus:ring-red-500/20"
 						/>
 					</div>
 					<div>
@@ -119,19 +119,19 @@
 						<div class="grid grid-cols-3 gap-2">
 							<button
 								onclick={() => (newVis = 'private')}
-								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'private' ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-white/10 bg-white/5'}"
+								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'private' ? 'border-red-400/40 bg-red-500/10' : 'border-white/10 bg-white/5'}"
 							>
 								<Lock class="h-3 w-3" /> Private
 							</button>
 							<button
 								onclick={() => (newVis = 'internal')}
-								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'internal' ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-white/10 bg-white/5'}"
+								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'internal' ? 'border-red-400/40 bg-red-500/10' : 'border-white/10 bg-white/5'}"
 							>
 								<Eye class="h-3 w-3" /> Internal
 							</button>
 							<button
 								onclick={() => (newVis = 'public')}
-								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'public' ? 'border-emerald-400/40 bg-emerald-500/10' : 'border-white/10 bg-white/5'}"
+								class="flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-medium transition-all {newVis === 'public' ? 'border-red-400/40 bg-red-500/10' : 'border-white/10 bg-white/5'}"
 							>
 								<Globe class="h-3 w-3" /> Public
 							</button>
@@ -149,7 +149,7 @@
 					<button
 						onclick={handleCreate}
 						disabled={!newName}
-						class="rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/15 transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+						class="rounded-xl bg-gradient-to-r from-red-500 to-rose-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-500/15 transition-all hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						Create
 					</button>
@@ -161,7 +161,7 @@
 	<!-- REPO LIST -->
 	{#if loading}
 		<div class="flex items-center justify-center py-20">
-			<div class="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+			<div class="h-8 w-8 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
 		</div>
 	{:else if filtered.length === 0}
 		<div class="flex flex-col items-center justify-center py-20 text-white/30">
@@ -177,15 +177,15 @@
 					in:fade={{ duration: 300, delay: i * 50, easing: cubicOut }}
 				>
 					<div
-						class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400/20 to-cyan-400/20"
+						class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-400/20 to-rose-400/20"
 					>
-						<svelte:component this={visibilityIcon(repo.visibility)} class="h-4 w-4 text-emerald-400/60" />
+						<svelte:component this={visibilityIcon(repo.visibility)} class="h-4 w-4 text-red-400/60" />
 					</div>
 
 					<div class="min-w-0 flex-1">
 						<a
 							href="/dashboard/kazilsky/{repo.name}"
-							class="font-medium text-white/80 transition-colors hover:text-emerald-400"
+							class="font-medium text-white/80 transition-colors hover:text-red-400"
 						>
 							{repo.name}
 						</a>
@@ -196,7 +196,7 @@
 
 					<div class="hidden items-center gap-4 sm:flex">
 						<span
-							class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'private' ? 'border-white/10 text-white/40' : repo.visibility === 'public' ? 'border-emerald-400/20 text-emerald-400/60' : 'border-blue-400/20 text-blue-400/60'}"
+							class="rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'private' ? 'border-white/10 text-white/40' : repo.visibility === 'public' ? 'border-red-400/20 text-red-400/60' : 'border-blue-400/20 text-blue-400/60'}"
 						>
 							{repo.visibility}
 						</span>
@@ -207,7 +207,7 @@
 
 					<a
 						href="/dashboard/kazilsky/{repo.name}"
-						class="flex h-8 w-8 items-center justify-center rounded-lg text-white/20 transition-all hover:bg-white/10 hover:text-emerald-400"
+						class="flex h-8 w-8 items-center justify-center rounded-lg text-white/20 transition-all hover:bg-white/10 hover:text-red-400"
 					>
 						<ArrowRight class="h-4 w-4" />
 					</a>

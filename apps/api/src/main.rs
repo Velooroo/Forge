@@ -37,13 +37,17 @@ async fn main() -> anyhow::Result<()> {
     // 4. Роутинг
     let app = Router::new()
         .route("/api/health", get(|| async { "Forge is up" }))
-        // Группа API
-        .nest("/api", handlers::api_router())
-        // .layer(middleware::from_fn_with_state(
-        //     state.clone(),
-        //     handlers::middleware::require_auth,
-        // ))
-        // Git роуты (тоже с auth)
+        // Публичное API (auth)
+        .nest("/api/auth", handlers::auth::auth_router())
+        // Защищённое API (repos)
+        .nest(
+            "/api/repos",
+            handlers::repo::repo_router().layer(middleware::from_fn_with_state(
+                state.clone(),
+                handlers::middleware::require_auth,
+            )),
+        )
+        // Git роуты (с auth)
         .nest(
             "/git",
             Router::new()

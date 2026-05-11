@@ -118,7 +118,7 @@
 <div class="p-6 lg:p-8">
 	{#if loading}
 		<div class="flex items-center justify-center py-20">
-			<div class="h-8 w-8 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+			<div class="h-8 w-8 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
 		</div>
 	{:else if error}
 		<div class="flex flex-col items-center justify-center py-20 text-white/30">
@@ -143,7 +143,7 @@
 						<div class="flex items-center gap-3">
 							<h1 class="truncate text-2xl font-bold">{repo.name}</h1>
 							<span
-								class="shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'public' ? 'border-emerald-400/20 text-emerald-400/60' : repo.visibility === 'internal' ? 'border-blue-400/20 text-blue-400/60' : 'border-white/10 text-white/40'}"
+								class="shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider {repo.visibility === 'public' ? 'border-red-400/20 text-red-400/60' : repo.visibility === 'internal' ? 'border-blue-400/20 text-blue-400/60' : 'border-white/10 text-white/40'}"
 							>
 								{repo.visibility}
 							</span>
@@ -207,7 +207,7 @@
 				<div class="mt-4 flex items-center gap-2 rounded-xl bg-white/5 px-4 py-3">
 					<code class="flex-1 text-xs text-white/40 font-mono">{repo.clone_url}</code>
 					<button onclick={copyUrl}
-						class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-white/40 transition-all hover:bg-white/10 hover:text-emerald-400">
+						class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-white/40 transition-all hover:bg-white/10 hover:text-red-400">
 						<Copy class="h-3 w-3" />
 						{coped ? 'Copied!' : 'Copy'}
 					</button>

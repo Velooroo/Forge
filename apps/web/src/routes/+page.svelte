@@ -71,16 +71,16 @@
 </script>
 
 <div
-	class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030607] font-sans text-white selection:bg-emerald-500/30"
+	class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030607] font-sans text-white selection:bg-red-500/30"
 >
 	<!-- AURORA / GLOW BACKGROUND -->
 	<div class="absolute inset-0 z-0 overflow-hidden">
 		<!-- Вместо Framer Motion используем CSS-анимацию через keyframes (простая, понятная) -->
 		<div
-			class="aurora-1 absolute top-[-15%] left-[-15%] h-[900px] w-[900px] rounded-full bg-emerald-500/20 blur-[140px]"
+			class="aurora-1 absolute top-[-15%] left-[-15%] h-[900px] w-[900px] rounded-full bg-red-500/20 blur-[140px]"
 		/>
 		<div
-			class="aurora-2 absolute right-[-15%] bottom-[-15%] h-[900px] w-[900px] rounded-full bg-cyan-500/18 blur-[140px]"
+			class="aurora-2 absolute right-[-15%] bottom-[-15%] h-[900px] w-[900px] rounded-full bg-rose-500/18 blur-[140px]"
 		/>
 		<div
 			class="absolute top-[25%] right-[35%] h-[520px] w-[520px] rounded-full bg-blue-500/10 blur-[140px]"
@@ -99,17 +99,17 @@
 				<div
 					class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur"
 				>
-					<Sparkles class="h-3 w-3 text-emerald-300" />
+					<Sparkles class="h-3 w-3 text-rose-300" />
 					<span>System Online</span>
 					<span
-						class="ml-1 inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.8)]"
+						class="ml-1 inline-flex h-2 w-2 rounded-full bg-red-400 shadow-[0_0_14px_rgba(220,38,38,0.8)]"
 					/>
 				</div>
 
 				<h1 class="text-6xl leading-[1.05] font-bold tracking-tight">
 					Deployment
 					<span
-						class="bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-300 bg-clip-text text-transparent"
+						class="bg-gradient-to-r from-rose-300 via-rose-400 to-rose-500 bg-clip-text text-transparent"
 					>
 						for hardware.
 					</span>
@@ -140,7 +140,7 @@
 				class="group relative w-full max-w-[420px]"
 				in:fadeScale={{ duration: 700, easing: cubicOut, start: 0.98 }}
 			>
-				<!-- BORDER GLOW (emerald -> cyan -> blue) -->
+				<!-- BORDER GLOW (red -> rose) -->
 				<div
 					class="absolute -inset-[1px] rounded-3xl opacity-70 blur-md transition duration-700 group-hover:opacity-100"
 				/>
@@ -152,7 +152,7 @@
 					<div class="mb-8 flex flex-col items-center">
 						<div
 							class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl
-              bg-gradient-to-tr from-emerald-400/80 to-cyan-400/80 shadow-lg shadow-emerald-500/15"
+              bg-gradient-to-tr from-red-400/80 to-rose-400/80 shadow-lg shadow-red-500/15"
 						>
 							<Cpu class="h-6 w-6 text-white/80" />
 						</div>
