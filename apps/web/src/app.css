@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-forge-50: #f0f7ff;
-  --color-forge-100: #e0effe;
-  --color-forge-200: #b9dffd;
-  --color-forge-300: #7cc5fc;
-  --color-forge-400: #36a8f8;
-  --color-forge-500: #0c8ee9;
-  --color-forge-600: #0070c7;
-  --color-forge-700: #0159a1;
-  --color-forge-800: #064b85;
-  --color-forge-900: #0b3f6e;
-  --color-forge-950: #07284a;
+  --color-forge-50: #fff7ed;
+  --color-forge-100: #ffedd5;
+  --color-forge-200: #fed7aa;
+  --color-forge-300: #fdba74;
+  --color-forge-400: #fb923c;
+  --color-forge-500: #f97316;
+  --color-forge-600: #ea580c;
+  --color-forge-700: #c2410c;
+  --color-forge-800: #9a3412;
+  --color-forge-900: #7c2d12;
+  --color-forge-950: #431407;
 
   --color-surface-50: #f6f6f9;
   --color-surface-100: #ecedf2;
@@ -25,60 +25,24 @@
   --color-surface-900: #343646;
   --color-surface-950: #1a1b26;
 
-  --color-accent-50: #fdf4ff;
-  --color-accent-100: #fae8ff;
-  --color-accent-200: #f5d0fe;
-  --color-accent-300: #f0abfc;
-  --color-accent-400: #e879f9;
-  --color-accent-500: #d946ef;
-  --color-accent-600: #c026d3;
-  --color-accent-700: #a21caf;
-  --color-accent-800: #86198f;
-  --color-accent-900: #701a75;
-  --color-accent-950: #4a044e;
+  --color-accent-50: #fef2f2;
+  --color-accent-100: #fee2e2;
+  --color-accent-200: #fecaca;
+  --color-accent-300: #fca5a5;
+  --color-accent-400: #f87171;
+  --color-accent-500: #ef4444;
+  --color-accent-600: #dc2626;
+  --color-accent-700: #b91c1c;
+  --color-accent-800: #991b1b;
+  --color-accent-900: #7f1d1d;
+  --color-accent-950: #450a0a;
 }
 
 @keyframes aurora {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-  25% { transform: translate(10%, -10%) scale(1.1); opacity: 0.5; }
-  50% { transform: translate(-5%, 15%) scale(0.95); opacity: 0.35; }
-  75% { transform: translate(15%, 5%) scale(1.05); opacity: 0.45; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.animate-aurora {
-  animation: aurora 8s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out forwards;
-}
-
-.animate-slide-up {
-  animation: slide-up 0.4s ease-out forwards;
-}
-
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out forwards;
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+  25% { transform: translate(10%, -10%) scale(1.1); opacity: 0.25; }
+  50% { transform: translate(-5%, 15%) scale(0.95); opacity: 0.2; }
+  75% { transform: translate(15%, 5%) scale(1.05); opacity: 0.25; }
 }
 
 html {
@@ -94,40 +58,14 @@ body {
   @apply bg-forge-500/30 text-white;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-surface-700 rounded-full hover:bg-surface-600 transition-colors; }
 
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-surface-700 rounded-full hover:bg-surface-600 transition-colors;
-}
-
-/* Glass effect */
 .glass {
   @apply bg-surface-900/60 backdrop-blur-xl border border-surface-700/50;
 }
 
-.glass-hover {
-  @apply hover:bg-surface-800/80 hover:border-surface-600/50 transition-all duration-200;
-}
-
-/* Card hover */
-.card-hover {
-  @apply transition-all duration-200 hover:bg-surface-800/50 hover:border-surface-600/50 cursor-pointer;
-}
-
-/* Focus ring */
-.focus-ring {
-  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-forge-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-950;
-}
-
-/* Input base */
 .input-base {
   @apply w-full px-3 py-2 bg-surface-900 border border-surface-700 rounded-lg text-surface-100 
          placeholder:text-surface-400 focus:outline-none focus:border-forge-500 focus:ring-1 focus:ring-forge-500/30

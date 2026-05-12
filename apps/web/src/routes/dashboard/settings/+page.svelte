@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Settings, User, Shield, Bell, ChevronRight } from 'lucide-svelte';
+	import { fade } from 'svelte/transition';
+	import { Settings, User, ChevronRight } from 'lucide-svelte';
 
 	let user = $state<any>(null);
 	let loading = $state(true);
@@ -8,9 +9,7 @@
 	const API = 'http://localhost:8080/api';
 
 	function getToken(): string | null {
-		if (typeof localStorage !== 'undefined') {
-			return localStorage.getItem('forge_token');
-		}
+		if (typeof localStorage !== 'undefined') return localStorage.getItem('forge_token');
 		return null;
 	}
 
@@ -28,58 +27,50 @@
 	});
 </script>
 
-<div class="min-h-screen bg-surface-950">
-	<header class="border-b border-surface-800/50 glass">
-		<div class="max-w-4xl mx-auto px-6">
-			<div class="flex items-center gap-2 h-12 text-sm text-surface-400">
-				<a href="/" class="hover:text-surface-200 transition-colors">Dashboard</a>
-				<ChevronRight size={14} />
-				<span class="text-surface-100">Settings</span>
-			</div>
-			<h1 class="text-xl font-bold text-surface-100 pb-4">Settings</h1>
-		</div>
+<div class="h-full flex flex-col">
+	<header class="flex items-center gap-2 px-6 h-12 border-b border-surface-800/30 text-xs text-surface-500 shrink-0">
+		<a href="/" class="hover:text-surface-300 transition-colors">Dashboard</a>
+		<ChevronRight size={12} />
+		<span class="text-surface-400">Settings</span>
 	</header>
 
-	<div class="max-w-4xl mx-auto px-6 py-6">
-		<div class="glass rounded-xl p-6 animate-fade-in">
+	<div class="flex-1 overflow-y-auto p-5">
+		<div class="max-w-lg" in:fade={{ duration: 300 }}>
+			<h2 class="text-base font-medium text-surface-100 mb-4">Profile</h2>
 			{#if loading}
-				<div class="animate-pulse space-y-3">
-					<div class="h-4 bg-surface-800 rounded w-1/3" />
-					<div class="h-4 bg-surface-800 rounded w-1/2" />
+				<div class="space-y-3 animate-pulse">
+					<div class="h-4 bg-surface-800/30 rounded w-1/3" />
+					<div class="h-4 bg-surface-800/20 rounded w-1/2" />
+					<div class="h-4 bg-surface-800/20 rounded w-2/3" />
 				</div>
 			{:else if user}
-				<div class="flex items-center gap-4 mb-6">
-					<div class="w-14 h-14 rounded-full bg-gradient-to-br from-forge-400 to-forge-600 flex items-center justify-center text-xl font-medium text-white">
-						{user.username[0].toUpperCase()}
-					</div>
-					<div>
-						<h2 class="text-lg font-medium text-surface-100">{user.username}</h2>
-						<p class="text-sm text-surface-400">{user.email}</p>
-					</div>
-				</div>
-
-				<div class="space-y-4">
-					<div class="flex items-center justify-between py-3 border-b border-surface-800/50">
+				<div class="bg-surface-800/10 border border-surface-800/30 rounded-xl p-5">
+					<div class="flex items-center gap-3 mb-5">
+						<div class="w-10 h-10 rounded-full bg-gradient-to-br from-forge-400 to-forge-600 flex items-center justify-center text-sm font-bold text-white">
+							{user.username[0].toUpperCase()}
+						</div>
 						<div>
-							<p class="text-sm text-surface-200">Username</p>
-							<p class="text-xs text-surface-400">{user.username}</p>
+							<h3 class="text-sm font-medium text-surface-200">{user.username}</h3>
+							<p class="text-xs text-surface-500">{user.email}</p>
 						</div>
 					</div>
-					<div class="flex items-center justify-between py-3 border-b border-surface-800/50">
-						<div>
-							<p class="text-sm text-surface-200">Email</p>
-							<p class="text-xs text-surface-400">{user.email}</p>
+					<div class="space-y-0 divide-y divide-surface-800/20 text-sm">
+						<div class="flex items-center justify-between py-3">
+							<span class="text-surface-400">Username</span>
+							<span class="text-surface-200">{user.username}</span>
 						</div>
-					</div>
-					<div class="flex items-center justify-between py-3">
-						<div>
-							<p class="text-sm text-surface-200">Repositories</p>
-							<p class="text-xs text-surface-400">{user.repo_count} repos</p>
+						<div class="flex items-center justify-between py-3">
+							<span class="text-surface-400">Email</span>
+							<span class="text-surface-200">{user.email}</span>
+						</div>
+						<div class="flex items-center justify-between py-3">
+							<span class="text-surface-400">Repositories</span>
+							<span class="text-surface-200">{user.repo_count}</span>
 						</div>
 					</div>
 				</div>
 			{:else}
-				<p class="text-surface-400 text-sm">Not authenticated</p>
+				<p class="text-sm text-surface-500">Not authenticated</p>
 			{/if}
 		</div>
 	</div>
