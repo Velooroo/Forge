@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod collaborators;
+pub mod exec;
 pub mod middleware;
 pub mod repo;
 pub mod users;
@@ -13,6 +14,7 @@ pub fn api_router(state: Arc<AppState>) -> Router<Arc<AppState>> {
         .nest("/repos", repo::repo_router())
         .nest("/users", users::users_router())
         .nest("/collaborators", collaborators::collaborators_router())
+        .nest("/exec", exec::exec_router())
         .layer(from_fn_with_state(
             state.clone(),
             middleware::require_jwt,
