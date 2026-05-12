@@ -1,269 +1,319 @@
 <script lang="ts">
-	import Button from '../components/ui/Button.svelte';
-	import Input from '../components/ui/Input.svelte';
-	import Label from '../components/ui/Label.svelte';
-	import { Cpu, Github, ArrowRight, Sparkles, UserPlus } from 'lucide-svelte';
-	import { login, register, isAuthenticated, browser } from '../api/auth';
-	import { fade, scale, type TransitionConfig } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
+	import { GitBranch, Plus, Settings, LogOut, FileCode2, ChevronRight, Github } from 'lucide-svelte';
 
-	let email = $state('');
-	let password = $state('');
-	let username = $state('');
-	let isRegister = $state(false);
-	let authError = $state('');
+	let { data } = $props();
+
+	let loading = $state(false);
+	let repos: any[] = $state([]);
+	let user = $state<any>(null);
+	let showCreateModal = $state(false);
+	let newRepoName = $state('');
+	let newRepoDesc = $state('');
+	let newRepoPrivate = $state(false);
+	let error = $state('');
+
+	const API = 'http://localhost:8080/api';
+
+	function getToken(): string | null {
+		if (typeof localStorage !== 'undefined') {
+			return localStorage.getItem('forge_token');
+		}
+		return null;
+	}
+
+	async function fetchUser() {
+		const token = getToken();
+		if (!token) return;
+		try {
+			const res = await fetch(`${API}/users/me`, {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+			if (res.ok) user = await res.json();
+		} catch {}
+	}
+
+	async function fetchRepos() {
+		loading = true;
+		try {
+			const token = getToken();
+			const res = await fetch(`${API}/repos/mine`, {
+				headers: token ? { Authorization: `Bearer ${token}` } : {}
+			});
+			if (res.ok) repos = await res.json();
+		} catch {}
+		loading = false;
+	}
+
+	async function createRepo() {
+		if (!newRepoName.trim()) return;
+		error = '';
+		const token = getToken();
+		if (!token) { error = 'Not authenticated'; return; }
+		try {
+			const res = await fetch(`${API}/repos/create`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify({
+					name: newRepoName.trim(),
+					description: newRepoDesc.trim() || null,
+					is_private: newRepoPrivate
+				})
+			});
+			if (res.ok) {
+				showCreateModal = false;
+				newRepoName = '';
+				newRepoDesc = '';
+				newRepoPrivate = false;
+				await fetchRepos();
+			} else {
+				const err = await res.text();
+				error = err;
+			}
+		} catch { error = 'Failed to create repo'; }
+	}
+
+	function logout() {
+		localStorage.removeItem('forge_token');
+		user = null;
+		window.location.href = '/auth';
+	}
 
 	onMount(() => {
-		if (isAuthenticated()) {
-			window.location.href = '/dashboard';
-		}
+		fetchUser();
+		fetchRepos();
 	});
-
-	async function handleAuth(e: Event) {
-		e.preventDefault();
-		authError = '';
-		try {
-			if (isRegister) {
-				await register(username, email, password);
-			}
-			await login(email, password);
-			window.location.href = '/dashboard';
-		} catch (err) {
-			authError = 'Authentication failed. Check your credentials.';
-		}
-	}
-
-	export function fadeScale(
-		node: Element,
-		{
-			duration = 700,
-			delay = 0,
-			easing = (t: number) => t,
-			start = 0.98,
-			opacityStart = 0
-		}: {
-			duration?: number;
-			delay?: number;
-			easing?: (t: number) => number;
-			start?: number;
-			opacityStart?: number;
-		} = {}
-	): TransitionConfig {
-		const style = getComputedStyle(node);
-		const o0 = opacityStart;
-		const o1 = +style.opacity || 1;
-		const s0 = start;
-		const s1 = 1;
-
-		return {
-			delay,
-			duration,
-			easing,
-			css: (t) => {
-				// t: 0→1 вход
-				const opacity = o0 + (o1 - o0) * t;
-				const scale = s0 + (s1 - s0) * t;
-				return `opacity:${opacity};transform:scale(${scale});`;
-			}
-		};
-	}
 </script>
 
-<div
-	class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030607] font-sans text-white selection:bg-red-500/30"
->
-	<!-- AURORA / GLOW BACKGROUND -->
-	<div class="absolute inset-0 z-0 overflow-hidden">
-		<!-- Вместо Framer Motion используем CSS-анимацию через keyframes (простая, понятная) -->
-		<div
-			class="aurora-1 absolute top-[-15%] left-[-15%] h-[900px] w-[900px] rounded-full bg-red-500/20 blur-[140px]"
-		/>
-		<div
-			class="aurora-2 absolute right-[-15%] bottom-[-15%] h-[900px] w-[900px] rounded-full bg-rose-500/18 blur-[140px]"
-		/>
-		<div
-			class="absolute top-[25%] right-[35%] h-[520px] w-[520px] rounded-full bg-blue-500/10 blur-[140px]"
-		/>
-	</div>
+<div class="flex h-screen overflow-hidden">
+	<!-- Sidebar -->
+	<aside class="w-64 glass border-r border-surface-700/50 flex flex-col shrink-0 animate-fade-in">
+		<div class="flex items-center gap-3 px-5 h-16 border-b border-surface-700/30">
+			<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-forge-400 to-accent-500 flex items-center justify-center">
+				<FileCode2 size={16} class="text-white" />
+			</div>
+			<div>
+				<h1 class="font-semibold text-surface-100 text-sm tracking-tight">Forge</h1>
+				<p class="text-xs text-surface-400">by Veloro</p>
+			</div>
+		</div>
 
-	<!-- SUBTLE GRID (masked) -->
-	<div
-		class="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_65%_60%_at_50%_45%,black,transparent)] bg-[size:72px_72px]"
-	/>
-
-	<div class="z-10 grid w-full max-w-6xl gap-20 px-6 lg:grid-cols-2">
-		<!-- LEFT -->
-		<div class="hidden flex-col justify-center space-y-10 lg:flex">
-			<div in:fadeScale={{ duration: 700, easing: cubicOut, start: 0.98 }}>
-				<div
-					class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur"
-				>
-					<Sparkles class="h-3 w-3 text-rose-300" />
-					<span>System Online</span>
-					<span
-						class="ml-1 inline-flex h-2 w-2 rounded-full bg-red-400 shadow-[0_0_14px_rgba(220,38,38,0.8)]"
-					/>
+		<div class="flex-1 overflow-y-auto p-3 space-y-1">
+			{#if user}
+				<div class="flex items-center gap-2 px-3 py-2 text-xs text-surface-400 mb-3">
+					<div class="w-6 h-6 rounded-full bg-gradient-to-br from-forge-400 to-forge-600 flex items-center justify-center text-[10px] font-medium text-white">
+						{user.username[0].toUpperCase()}
+					</div>
+					<span class="truncate">{user.username}</span>
+					<span class="ml-auto text-surface-500">{user.repo_count}</span>
 				</div>
+			{/if}
 
-				<h1 class="text-6xl leading-[1.05] font-bold tracking-tight">
-					Deployment
-					<span
-						class="bg-gradient-to-r from-rose-300 via-rose-400 to-rose-500 bg-clip-text text-transparent"
-					>
-						for hardware.
-					</span>
-				</h1>
+			<button
+				onclick={() => showCreateModal = true}
+				class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-surface-300 
+					   hover:bg-surface-800/50 hover:text-surface-100 transition-all duration-200 group"
+			>
+				<div class="w-5 h-5 rounded-md bg-forge-500/10 flex items-center justify-center group-hover:bg-forge-500/20 transition-colors">
+					<Plus size={14} class="text-forge-400" />
+				</div>
+				<span>New Repository</span>
+			</button>
 
-				<p class="mt-6 max-w-md text-lg leading-relaxed text-white/55">
-					Forge is your Git control plane with Spark integration for fleets. Soft UI, hard
-					infrastructure.
-				</p>
+			<div class="pt-3 pb-1 px-3 text-[11px] font-medium text-surface-500 uppercase tracking-wider">
+				Repositories
 			</div>
 
-			<div class="grid max-w-md grid-cols-2 gap-4">
-				{#each [{ label: 'Uptime', val: '99.99%' }, { label: 'Deploy', val: '< 50ms' }] as item, i}
-					<div
-						class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
-						in:fadeScale={{ duration: 700, easing: cubicOut, start: 0.98 }}
-					>
-						<div class="text-sm text-white/45">{item.label}</div>
-						<div class="mt-1 text-xl font-semibold">{item.val}</div>
+			{#each repos as repo}
+				<a
+					href="/{repo.owner_username}/{repo.name}"
+					class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-surface-300 
+						   hover:bg-surface-800/40 hover:text-surface-100 transition-all duration-200 group"
+				>
+					<GitBranch size={14} class="text-surface-500 group-hover:text-forge-400 transition-colors shrink-0" />
+					<span class="truncate">{repo.name}</span>
+					{#if repo.is_private}
+						<span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-surface-800 text-surface-400">Private</span>
+					{/if}
+				</a>
+			{/each}
+
+			{#if loading}
+				<div class="space-y-2 px-3 pt-2">
+					<div class="h-5 bg-surface-800/50 rounded animate-pulse" />
+					<div class="h-5 bg-surface-800/50 rounded animate-pulse w-3/4" />
+				</div>
+			{/if}
+		</div>
+
+		<div class="p-3 border-t border-surface-700/30 space-y-1">
+			<a
+				href="/dashboard/settings"
+				class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-surface-400 
+					   hover:bg-surface-800/30 hover:text-surface-200 transition-all duration-200"
+			>
+				<Settings size={14} />
+				Settings
+			</a>
+			<button
+				onclick={logout}
+				class="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-surface-400 
+					   hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
+			>
+				<LogOut size={14} />
+				Logout
+			</button>
+		</div>
+	</aside>
+
+	<!-- Main content -->
+	<main class="flex-1 overflow-y-auto">
+		<!-- Header -->
+		<header class="h-16 border-b border-surface-800/50 flex items-center justify-between px-6 glass">
+			<div class="flex items-center gap-3">
+				<h2 class="text-lg font-medium text-surface-100">Dashboard</h2>
+				<span class="text-xs text-surface-500 bg-surface-800/50 px-2 py-0.5 rounded-full">
+					{repos.length} repos
+				</span>
+			</div>
+			<a
+				href="https://github.com/Velooroo/Forge"
+				target="_blank"
+				class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm text-surface-400 
+					   hover:bg-surface-800/40 hover:text-surface-200 transition-all duration-200"
+			>
+				<Github size={16} />
+				<span class="hidden sm:inline">Source</span>
+			</a>
+		</header>
+
+		<!-- Content -->
+		<div class="p-6 space-y-6">
+			{#if repos.length === 0 && !loading}
+				<div class="flex flex-col items-center justify-center py-20 animate-fade-in">
+					<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-forge-500/20 to-accent-500/20 flex items-center justify-center mb-4">
+						<GitBranch size={32} class="text-forge-400" />
 					</div>
+					<h3 class="text-lg font-medium text-surface-300 mb-2">No repositories yet</h3>
+					<p class="text-sm text-surface-500 mb-6">Create your first repository to get started</p>
+					<button
+						onclick={() => showCreateModal = true}
+						class="px-4 py-2 bg-forge-500 hover:bg-forge-400 text-white rounded-lg text-sm font-medium 
+							   transition-all duration-200 hover:shadow-lg hover:shadow-forge-500/25 active:scale-[0.98]"
+					>
+						Create Repository
+					</button>
+				</div>
+			{/if}
+
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+				{#each repos as repo, i}
+					<a
+						href="/{repo.owner_username}/{repo.name}"
+						class="glass rounded-xl p-4 card-hover animate-slide-up"
+						style="animation-delay: {i * 0.05}s"
+					>
+						<div class="flex items-start justify-between mb-3">
+							<div class="flex items-center gap-2">
+								<GitBranch size={16} class="text-forge-400 shrink-0" />
+								<span class="font-medium text-sm text-surface-200 truncate">{repo.name}</span>
+							</div>
+							{#if repo.is_private}
+								<span class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 text-surface-400 shrink-0">Private</span>
+							{/if}
+						</div>
+						<p class="text-xs text-surface-400 line-clamp-2 mb-3">
+							{repo.description || 'No description'}
+						</p>
+						<div class="flex items-center gap-2 text-xs text-surface-500">
+							<ChevronRight size={12} />
+							<span class="truncate">{repo.owner_username}/{repo.name}</span>
+						</div>
+					</a>
 				{/each}
 			</div>
 		</div>
+	</main>
+</div>
 
-		<!-- RIGHT -->
-		<div class="flex items-center justify-center">
-			<div
-				class="group relative w-full max-w-[420px]"
-				in:fadeScale={{ duration: 700, easing: cubicOut, start: 0.98 }}
-			>
-				<!-- BORDER GLOW (red -> rose) -->
-				<div
-					class="absolute -inset-[1px] rounded-3xl opacity-70 blur-md transition duration-700 group-hover:opacity-100"
-				/>
+<!-- Create Repo Modal -->
+{#if showCreateModal}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+		onclick={() => showCreateModal = false}
+		role="dialog"
+	>
+		<div
+			class="glass rounded-2xl p-6 w-full max-w-md mx-4 animate-scale-in"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<h3 class="text-lg font-medium text-surface-100 mb-1">New Repository</h3>
+			<p class="text-sm text-surface-400 mb-5">Create a new repository for your project</p>
 
-				<!-- INNER GLASS CARD -->
-				<div
-					class="relative rounded-3xl border border-white/10 bg-white/[0.06] p-8 shadow-2xl backdrop-blur-xl"
-				>
-					<div class="mb-8 flex flex-col items-center">
-						<div
-							class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl
-              bg-gradient-to-tr from-red-400/80 to-rose-400/80 shadow-lg shadow-red-500/15"
-						>
-							<Cpu class="h-6 w-6 text-white/80" />
-						</div>
-						<h2 class="text-2xl font-bold">Welcome Back</h2>
-						<p class="mt-2 text-sm text-white/45">Sign in to access your console</p>
+			<div class="space-y-4">
+				<div>
+					<label for="repo-name" class="block text-xs font-medium text-surface-300 mb-1.5">Name</label>
+					<input
+						id="repo-name"
+						type="text"
+						placeholder="my-awesome-project"
+						bind:value={newRepoName}
+						class="input-base text-sm"
+					/>
+				</div>
+
+				<div>
+					<label for="repo-desc" class="block text-xs font-medium text-surface-300 mb-1.5">Description (optional)</label>
+					<textarea
+						id="repo-desc"
+						placeholder="A short description..."
+						bind:value={newRepoDesc}
+						class="input-base text-sm resize-none h-20"
+					></textarea>
+				</div>
+
+				<label class="flex items-center gap-3 cursor-pointer group">
+					<input
+						type="checkbox"
+						bind:checked={newRepoPrivate}
+						class="w-4 h-4 rounded border-surface-600 bg-surface-800 text-forge-500 
+							   focus:ring-forge-500/30 focus:ring-offset-0 cursor-pointer"
+					/>
+					<div class="flex flex-col">
+						<span class="text-sm text-surface-200 group-hover:text-surface-100 transition-colors">Private repository</span>
+						<span class="text-xs text-surface-500">Only you and collaborators can access</span>
 					</div>
+				</label>
 
-					<form class="space-y-5" onsubmit={handleAuth}>
-						{#if isRegister}
-							<div class="space-y-2">
-								<Label>Username</Label>
-								<Input
-									placeholder="you"
-									bind:value={username}
-									class_el="w-[70%]"
-								/>
-							</div>
-						{/if}
-						<div class="space-y-2">
-							<Label>Email</Label>
-							<Input
-								placeholder="you@forge.dev"
-								bind:value={email}
-								class_el="w-[80%]"
-							/>
-						</div>
-
-						<div class="space-y-2">
-							<Label>Password</Label>
-							<Input
-								type="password"
-								placeholder="••••••••"
-								bind:value={password}
-								class_el="w-[70%]"
-							/>
-						</div>
-
-						{#if authError}
-							<p class="text-xs text-red-400">{authError}</p>
-						{/if}
-
-						<Button type="submit">
-							{isRegister ? 'Create Account' : 'Sign In'}
-							<ArrowRight class="ml-2 h-4 w-4" />
-						</Button>
-					</form>
-
-					<div class="mt-4 text-center">
-						<button
-							onclick={() => (isRegister = !isRegister)}
-							class="text-xs text-white/40 transition-colors hover:text-white/60"
-						>
-							{isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
-						</button>
+				{#if error}
+					<div class="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">
+						{error}
 					</div>
+				{/if}
 
-					<div class="mt-8 border-t border-white/10 pt-6">
-						<Button
-							variant="outline"
-						>
-							<Github class="mr-2 h-4 w-4" />
-							Continue with GitHub
-						</Button>
-					</div>
-
-					<div class="mt-6 text-center">
-						<p class="text-xs text-white/30">
-							By signing in, you agree to our
-							<a href="#" class="text-white/60 underline hover:text-white">Terms</a>
-						</p>
-					</div>
+				<div class="flex gap-3 pt-2">
+					<button
+						onclick={() => showCreateModal = false}
+						class="flex-1 px-4 py-2 rounded-lg text-sm text-surface-300 
+							   hover:bg-surface-800/50 transition-all duration-200"
+					>
+						Cancel
+					</button>
+					<button
+						onclick={createRepo}
+						disabled={!newRepoName.trim()}
+						class="flex-1 px-4 py-2 bg-forge-500 hover:bg-forge-400 disabled:bg-surface-700 disabled:text-surface-500 
+							   text-white rounded-lg text-sm font-medium transition-all duration-200 
+							   hover:shadow-lg hover:shadow-forge-500/25 active:scale-[0.98]"
+					>
+						Create
+					</button>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
-
-<style>
-	/* Простые понятные keyframes для “ауры”, аналог твоего motion.div */
-	@keyframes auroraMove1 {
-		0% {
-			transform: translate(0, 0) scale(1);
-			opacity: 0.18;
-		}
-		50% {
-			transform: translate(50px, -30px) scale(1.2);
-			opacity: 0.32;
-		}
-		100% {
-			transform: translate(0, 0) scale(1);
-			opacity: 0.18;
-		}
-	}
-	@keyframes auroraMove2 {
-		0% {
-			transform: translate(0, 0) scale(1);
-			opacity: 0.16;
-		}
-		50% {
-			transform: translate(-40px, 40px) scale(1.15);
-			opacity: 0.34;
-		}
-		100% {
-			transform: translate(0, 0) scale(1);
-			opacity: 0.16;
-		}
-	}
-	.aurora-1 {
-		animation: auroraMove1 10s ease-in-out infinite;
-	}
-	.aurora-2 {
-		animation: auroraMove2 12s ease-in-out infinite 1s;
-	}
-</style>
+{/if}

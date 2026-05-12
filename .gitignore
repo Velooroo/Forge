@@ -1,7 +1,4 @@
 target
+node_modules/
+.svelte-kit/
 .env
-.DS_Store
-node_modules
-dist
-build
-*.log

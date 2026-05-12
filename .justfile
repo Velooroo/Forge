@@ -10,6 +10,5 @@ db-up:
 	@docker run --name forge_db -e POSTGRES_PASSWORD=super_secret -p 5432:5432 -d postgres || docker start forge_db
 	@echo "Postgres is up!"
 
-# Миграции (когда поставишь sqlx-cli)
 migrate:
 	cd apps/api && sqlx migrate run

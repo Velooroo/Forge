@@ -1,15 +1,15 @@
 use axum::{
-    Router, middleware,
+    Router,
     routing::{get, post},
 };
 use std::sync::Arc;
-use tower_http::cors::CorsLayer;
 
 mod git;
 mod handlers;
 
 pub struct AppConfig {
     pub repo_storage: String,
+    pub jwt_secret: String,
 }
 
 pub struct AppState {
@@ -19,55 +19,41 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // 1. Инициализация (в будущем из .env)
-    let db_url = "postgres://postgres:super_secret@localhost:5432/postgres";
-    let pool = sqlx::PgPool::connect(db_url).await?;
+    dotenvy::dotenv().ok();
 
-    // 2. Мигрирование всех скриптов
+    let db_url = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "postgres://postgres:super_secret@localhost:5432/postgres".to_string());
+
+    let jwt_secret = std::env::var("JWT_SECRET")
+        .unwrap_or_else(|_| "forge-dev-secret-change-in-production".to_string());
+
+    let repo_storage = std::env::var("REPO_STORAGE")
+        .unwrap_or_else(|_| "./repositories".to_string());
+
+    let pool = sqlx::PgPool::connect(&db_url).await?;
     sqlx::migrate!().run(&pool).await?;
 
-    // 3. Инициализация состояния приложения
     let state = Arc::new(AppState {
         db: pool,
         config: AppConfig {
-            repo_storage: "./repositories".to_string(),
+            repo_storage,
+            jwt_secret,
         },
     });
 
-    // 4. Роутинг
     let app = Router::new()
         .route("/api/health", get(|| async { "Forge is up" }))
-        // Публичное API (auth)
-        .nest("/api/auth", handlers::auth::auth_router())
-        // Защищённое API (repos)
-        .nest(
-            "/api/repos",
-            handlers::repo::repo_router().layer(middleware::from_fn_with_state(
-                state.clone(),
-                handlers::middleware::require_auth,
-            )),
-        )
-        // Git роуты (с auth)
+        .nest("/api", handlers::api_router(state.clone()))
         .nest(
             "/git",
             Router::new()
                 .route("/:user/:repo/info/refs", get(git::handle_info_refs))
-                .route(
-                    "/:user/:repo/git-upload-pack",
-                    post(git::handle_upload_pack),
-                )
-                .route(
-                    "/:user/:repo/git-receive-pack",
-                    post(git::handle_receive_pack),
-                )
-                .route("/:user/:repo/archive", get(git::get_archive))
-                .layer(middleware::from_fn_with_state(
-                    state.clone(),
-                    handlers::middleware::require_auth,
-                )),
+                .route("/:user/:repo/git-upload-pack", post(git::handle_upload_pack))
+                .route("/:user/:repo/git-receive-pack", post(git::handle_receive_pack))
+                .route("/:user/:repo/archive", get(git::get_archive)),
         )
         .with_state(state)
-        .layer(CorsLayer::permissive());
+        .layer(tower_http::cors::CorsLayer::permissive());
 
     let listener = tokio::net::TcpListener::bind("localhost:8080").await?;
     println!("🔥 Forge glowing at 8080");
