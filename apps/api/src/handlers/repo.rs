@@ -36,6 +36,7 @@ pub fn repo_router() -> Router<Arc<AppState>> {
         .route("/create", post(create_repo))
         .route("/list", get(list_repos))
         .route("/mine", get(my_repos))
+        .route("/:owner/:name", get(get_repo_by_owner))
         .route("/:id", get(get_repo))
 }
 
@@ -180,6 +181,42 @@ async fn get_repo(
         WHERE r.id = $1
         "#,
         id
+    )
+    .fetch_optional(&state.db)
+    .await;
+
+    let repo = match repo {
+        Ok(Some(r)) => r,
+        Ok(None) => return (StatusCode::NOT_FOUND, "Repository not found").into_response(),
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, "DB error").into_response(),
+    };
+
+    let response = RepoResponse {
+        id: repo.id.to_string(),
+        name: repo.name.clone(),
+        description: repo.description,
+        is_private: repo.is_private,
+        clone_url: format!("http://localhost:8080/git/{}/{}", repo.owner_username, repo.name),
+        owner_username: repo.owner_username,
+        created_at: repo.created_at.map(|t| t.to_string()).unwrap_or_default(),
+    };
+
+    Json(response).into_response()
+}
+
+async fn get_repo_by_owner(
+    State(state): State<Arc<AppState>>,
+    Path((owner, name)): Path<(String, String)>,
+) -> impl IntoResponse {
+    let repo = sqlx::query!(
+        r#"
+        SELECT r.id, r.name, r.description, r.is_private, r.created_at, u.username as owner_username
+        FROM repositories r
+        JOIN users u ON r.owner_id = u.id
+        WHERE u.username = $1 AND r.name = $2
+        "#,
+        owner,
+        name
     )
     .fetch_optional(&state.db)
     .await;
